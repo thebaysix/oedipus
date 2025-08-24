@@ -1,6 +1,14 @@
+import sys
+from pathlib import Path
+
+# Add project root to sys.path so 'app' and 'components' are importable
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.append(str(PROJECT_ROOT))
+
 import streamlit as st
 import requests
-from core.config import settings
+from app.core.config import settings
 from components.upload import render_dataset_upload, render_output_upload, render_dataset_selector
 from components.dashboard import render_analysis_dashboard
 from app.workers.analysis_worker import celery_app, run_analysis_task

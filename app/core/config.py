@@ -1,6 +1,6 @@
 from pydantic_settings import BaseSettings
+from pydantic import field_validator, Field
 from typing import Optional
-
 
 class Settings(BaseSettings):
     # Environment
@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     POSTGRES_PORT: str = "5432"
 
     # Database
-    SQLALCHEMY_DATABASE_URL: str = None  # will be set in __init__
+    SQLALCHEMY_DATABASE_URL: str = Field(default="")  # will be built dynamically
 
     # Redis / Celery
     REDIS_URL: Optional[str] = None
@@ -28,24 +28,25 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-        # Build SQLAlchemy URL
-        self.SQLALCHEMY_DATABASE_URL = (
-            f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@"
-            f"{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+    # Use Pydantic v2 validator to build SQLAlchemy URL after init
+    @field_validator("SQLALCHEMY_DATABASE_URL", mode="before")
+    def build_sqlalchemy_url(cls, v, info):
+        return (
+            f"postgresql://{info.data.get('POSTGRES_USER')}:{info.data.get('POSTGRES_PASSWORD')}@"
+            f"{info.data.get('POSTGRES_HOST')}:{info.data.get('POSTGRES_PORT')}/{info.data.get('POSTGRES_DB')}"
         )
 
-        # Configure Redis/Celery only if not local
-        if self.OEDIPUS_ENV != "local":
-            self.REDIS_URL = self.REDIS_URL or "redis://localhost:6379/0"
-            self.celery_broker_url = self.REDIS_URL
-            self.celery_result_backend = self.REDIS_URL
-        else:
-            self.REDIS_URL = None
-            self.celery_broker_url = None
-            self.celery_result_backend = None
+    @field_validator("REDIS_URL", mode="before")
+    def configure_redis(cls, v, info):
+        if info.data.get("OEDIPUS_ENV") == "local":
+            return None
+        return v or "redis://localhost:6379/0"
+
+    @field_validator("celery_broker_url", "celery_result_backend", mode="before")
+    def configure_celery(cls, v, info):
+        if info.data.get("OEDIPUS_ENV") == "local":
+            return None
+        return info.data.get("REDIS_URL") or v
 
 
 settings = Settings()

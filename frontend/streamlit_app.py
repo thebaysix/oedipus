@@ -1,12 +1,14 @@
 import streamlit as st
 import requests
+from core.config import settings
 from components.upload import render_dataset_upload, render_output_upload, render_dataset_selector
 from components.dashboard import render_analysis_dashboard
+from app.workers.analysis_worker import celery_app, run_analysis_task
 
 # Page configuration
 st.set_page_config(
     page_title="Oedipus MVP",
-    page_icon="🔬",
+    page_icon="👑",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -52,6 +54,9 @@ page = st.sidebar.selectbox(
     ["🏠 Home", "📊 Upload Data", "🔬 Analysis", "📈 Dashboard"]
 )
 
+# Sidebar: local mode toggle (optional)
+use_local_mode = st.sidebar.checkbox("Use Local Mode", value=(settings.OEDIPUS_ENV=="local"))
+
 # API health check
 def check_api_health():
     try:
@@ -67,6 +72,15 @@ if api_healthy:
 else:
     st.sidebar.error("❌ API Disconnected")
     st.sidebar.info("Make sure the backend is running:\n`uvicorn app.api.main:app --reload`")
+
+# Helper to submit analysis respecting local mode
+def submit_analysis(data):
+    if use_local_mode or celery_app is None:
+        # Run synchronously for local development
+        return run_analysis_task(data)
+    else:
+        # Queue task with Celery
+        return celery_app.send_task("app.workers.analysis_worker.run_analysis_task", args=[data])
 
 # Page routing
 if page == "🏠 Home":
@@ -139,7 +153,7 @@ if page == "🏠 Home":
         - Sample data provided
         - Real-time progress tracking
         """)
-    
+
     # Sample data format
     st.subheader("📝 Data Format Examples")
     
@@ -212,7 +226,12 @@ elif page == "🔬 Analysis":
         st.warning("⚠️ No output dataset selected. Please upload data first.")
         st.info("Go to the 'Upload Data' page to upload your datasets.")
     else:
-        render_analysis_dashboard(st.session_state.current_output_id)
+        # Run analysis either locally or via Celery
+        output_id = st.session_state.current_output_id
+        with st.spinner("Running analysis..."):
+            results = submit_analysis(output_id)
+            st.session_state.analysis_results = results
+        render_analysis_dashboard(results)
 
 elif page == "📈 Dashboard":
     st.header("📈 Analysis Dashboard")

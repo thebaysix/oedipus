@@ -6,11 +6,15 @@ from ..core.config import settings
 from ..services.analysis_service import AnalysisService
 
 # Create Celery app
-celery_app = Celery(
-    "oedipus_worker",
-    broker=settings.celery_broker_url,
-    backend=settings.celery_result_backend
-)
+# Only enable Redis/Celery if not local
+if settings.OEDIPUS_ENV == "local" or not settings.REDIS_URL:
+    celery_app = None
+else:
+    celery_app = Celery(
+        "oedipus_worker",
+        broker=settings.celery_broker_url,
+        backend=settings.celery_result_backend,
+    )
 
 # Configure Celery
 celery_app.conf.update(

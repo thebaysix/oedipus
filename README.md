@@ -32,7 +32,7 @@ git clone <repository>
 cd oedipus
 
 # Start full stack
-docker-compose up --build
+docker compose up --build
 ```
 
 ### Access the Application
@@ -42,7 +42,7 @@ docker-compose up --build
 
 To stop:
 ```bash
-docker-compose down
+docker compose down
 ```
 
 ---
@@ -59,7 +59,7 @@ python scripts/setup.py
 
 ### 2. Start Infrastructure
 ```bash
-docker-compose up -d  # PostgreSQL + Redis
+docker compose up -d  # PostgreSQL + Redis
 ```
 
 ### 3. Initialize Database
@@ -195,7 +195,7 @@ oedipus/
 │   ├── components/    # Streamlit components
 │   └── utils/         # Helper functions
 ├── scripts/           # Setup & start scripts
-└── docker-compose.yml
+└── docker compose.yml
 ```
 
 ### Running Tests
@@ -222,14 +222,14 @@ alembic upgrade head
 
 **API Connection Failed**
 - Ensure backend is running on port 8000
-- Check Docker services: `docker-compose ps`
+- Check Docker services: `docker compose ps`
 
 **Database Connection Error**
-- Verify PostgreSQL is running: `docker-compose logs postgres`
+- Verify PostgreSQL is running: `docker compose logs postgres`
 - Check connection string in `.env`
 
 **Celery Worker Not Processing**
-- Ensure Redis is running: `docker-compose logs redis`
+- Ensure Redis is running: `docker compose logs redis`
 - Check worker logs for errors
 
 **Analysis Takes Too Long**
@@ -246,7 +246,7 @@ uvicorn app.api.main:app --log-level debug
 celery -A app.workers.analysis_worker worker --loglevel=debug
 
 # Docker service logs
-docker-compose logs [service_name]
+docker compose logs [service_name]
 ```
 
 ## Performance

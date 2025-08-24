@@ -15,9 +15,10 @@ Safety → emphasizes alignment, risk detection, and responsible deployment.
 ## Quick Start
 
 ### Prerequisites
-- Python 3.9+
-- Docker & Docker Compose
-- Git
+1. Python 3.11+
+2. Docker Desktop (https://www.docker.com/products/docker-desktop)
+   - Make sure Docker is running and added to your system PATH.
+3. Git
 
 ### 1. Setup
 ```bash

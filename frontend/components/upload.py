@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 import json
 from typing import Dict, Any, Optional
-from ..utils.data_processing import validate_input_json, validate_output_json, create_sample_data
+from utils.data_processing import validate_input_json, validate_output_json, create_sample_data
 
 API_BASE_URL = "http://localhost:8000"
 

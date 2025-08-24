@@ -20,36 +20,41 @@ Safety → emphasizes alignment, risk detection, and responsible deployment.
    - Make sure Docker is running and added to your system PATH.
 3. Git
 
-### 1. Setup
+---
+
+## Option 1: Run with Docker
+
+This starts everything (API, DB, Redis, Worker, Frontend) in containers.
+
+```bash
+# Clone repository
+git clone <repository>
+cd oedipus
+
+# Start full stack
+docker-compose up --build
+```
+
+### Access the Application
+- **Frontend UI**: http://localhost:8501
+- **API Documentation**: http://localhost:8000/docs
+- **API Health**: http://localhost:8000/health
+
+To stop:
+```bash
+docker-compose down
+```
+
+---
+
+## Option 2: Local Development Setup
+
+### 1. Setup Environment
 ```bash
 # Clone and setup
 git clone <repository>
 cd oedipus
 python scripts/setup.py
-```
-
-### 2. Start Services
-```bash
-# Terminal 1: Start backend API
-python scripts/start_backend.py
-
-# Terminal 2: Start Celery worker
-python scripts/start_worker.py
-
-# Terminal 3: Start frontend
-python scripts/start_frontend.py
-```
-
-### 3. Access the Application
-- **Frontend UI**: http://localhost:8501
-- **API Documentation**: http://localhost:8000/docs
-- **API Health**: http://localhost:8000/health
-
-## Manual Setup (Alternative)
-
-### 1. Install Dependencies
-```bash
-pip install -r requirements.txt
 ```
 
 ### 2. Start Infrastructure
@@ -64,15 +69,22 @@ alembic upgrade head
 
 ### 4. Start Services
 ```bash
-# Backend API
-uvicorn app.api.main:app --reload
+# Terminal 1: Backend API
+python scripts/start_backend.py
 
-# Celery Worker (new terminal)
-celery -A app.workers.analysis_worker worker --loglevel=info
+# Terminal 2: Celery worker
+python scripts/start_worker.py
 
-# Frontend (new terminal)
-streamlit run frontend/streamlit_app.py
+# Terminal 3: Frontend
+python scripts/start_frontend.py
 ```
+
+### Access the Application
+- **Frontend UI**: http://localhost:8501
+- **API Documentation**: http://localhost:8000/docs
+- **API Health**: http://localhost:8000/health
+
+---
 
 ## Usage
 

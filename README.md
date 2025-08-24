@@ -1,3 +1,13 @@
+# Oedipus
+
+Observation → grounding in monitoring/logging model outputs.
+Evaluation → structured scoring of model behaviors.
+Diagnostics → pinpointing failure modes, systematic weaknesses.
+Information-theoretic → ties directly to your entropy/empowerment/information gain metrics.
+Performance → addresses task completion, factual accuracy, benchmarks.
+Understanding → reflects deeper interpretability and model behavior insights.
+Safety → emphasizes alignment, risk detection, and responsible deployment.
+
 # Oedipus MVP - Phase 1
 
 *Observability & Analytics Infrastructure for AI Systems*

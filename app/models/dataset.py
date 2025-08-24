@@ -13,4 +13,4 @@ class Dataset(Base):
     user_id = Column(UUID(as_uuid=True), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     inputs = Column(JSON, nullable=False)  # mapping inputId -> input_string
-    metadata = Column(JSON, default=dict)  # user-defined metadata
+    user_metadata = Column(JSON, default=dict)  # user-defined metadata

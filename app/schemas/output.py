@@ -17,6 +17,18 @@ class OutputDatasetResponse(BaseModel):
     created_at: datetime
     outputs: Dict[str, List[str]]
     metadata: Dict[str, Any]
+
+    @classmethod
+    def from_orm_with_alias(cls, obj: "OutputDataset"):
+        # Map ORM user_metadata -> API metadata
+        return cls(
+            id=obj.id,
+            name=obj.name,
+            dataset_id=obj.dataset_id,
+            created_at=obj.created_at,
+            outputs=obj.outputs,
+            metadata=getattr(obj, 'user_metadata', {}) or {}
+        )
     
     class Config:
         from_attributes = True

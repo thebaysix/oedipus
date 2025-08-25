@@ -17,7 +17,7 @@ class DatasetService:
             name=dataset_data.name,
             user_id=user_id,
             inputs=dataset_data.inputs,
-            metadata=dataset_data.metadata
+            user_metadata=dataset_data.metadata
         )
         self.db.add(db_dataset)
         self.db.commit()
@@ -57,7 +57,7 @@ class DatasetService:
             name=output_data.name,
             dataset_id=dataset_id,
             outputs=output_data.outputs,
-            metadata=output_data.metadata
+            user_metadata=output_data.metadata
         )
         self.db.add(db_output)
         self.db.commit()

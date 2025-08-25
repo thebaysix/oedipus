@@ -21,7 +21,7 @@ def create_dataset(
     try:
         service = DatasetService(db)
         db_dataset = service.create_dataset(dataset, MOCK_USER_ID)
-        return db_dataset
+        return DatasetResponse.from_orm_with_alias(db_dataset)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -38,7 +38,7 @@ def get_datasets(
     """Get all datasets for the current user."""
     service = DatasetService(db)
     datasets = service.get_datasets(MOCK_USER_ID, skip=skip, limit=limit)
-    return datasets
+    return [DatasetResponse.from_orm_with_alias(d) for d in datasets]
 
 
 @router.get("/{dataset_id}", response_model=DatasetResponse)
@@ -56,4 +56,4 @@ def get_dataset(
             detail="Dataset not found"
         )
     
-    return dataset
+    return DatasetResponse.from_orm_with_alias(dataset)

@@ -14,7 +14,7 @@ class OutputDataset(Base):
     dataset_id = Column(UUID(as_uuid=True), ForeignKey("datasets.id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     outputs = Column(JSON, nullable=False)  # mapping (dataset_name, input_id) -> [output_strings]
-    user_metadata = Column(JSON, default=dict)
+    user_metadata = Column('metadata', JSON, default=dict)
     
     # Relationship
     dataset = relationship("Dataset", backref="output_datasets")

@@ -19,7 +19,7 @@ def create_output_dataset(
     try:
         service = DatasetService(db)
         db_output = service.create_output_dataset(dataset_id, output_dataset)
-        return db_output
+        return OutputDatasetResponse.from_orm_with_alias(db_output)
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -49,7 +49,7 @@ def get_output_datasets(
         )
     
     output_datasets = service.get_output_datasets(dataset_id)
-    return output_datasets
+    return [OutputDatasetResponse.from_orm_with_alias(o) for o in output_datasets]
 
 
 @router.get("/{dataset_id}/outputs/{output_id}", response_model=OutputDatasetResponse)
@@ -74,4 +74,4 @@ def get_output_dataset(
             detail="Output dataset does not belong to the specified dataset"
         )
     
-    return output_dataset
+    return OutputDatasetResponse.from_orm_with_alias(output_dataset)

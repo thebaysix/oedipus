@@ -4,6 +4,7 @@ from sqlalchemy import create_engine
 import uuid
 from ..core.config import settings
 from ..services.analysis_service import AnalysisService
+from ..models import *  # Ensure all models are registered with SQLAlchemy before use
 
 # Database setup for worker
 engine = create_engine(settings.SQLALCHEMY_DATABASE_URL)

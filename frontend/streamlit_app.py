@@ -81,14 +81,22 @@ else:
     st.sidebar.error("❌ API Disconnected")
     st.sidebar.info("Make sure the backend is running:\n`uvicorn app.api.main:app --reload`")
 
-# Helper to submit analysis respecting local mode
+# Helper to submit analysis via API (synchronous for immediate results)
+# Expects `data` to be an output_dataset_id (UUID string)
 def submit_analysis(data):
-    if use_local_mode or celery_app is None:
-        # Run synchronously for local development
-        return run_analysis_task(data)
-    else:
-        # Queue task with Celery
-        return celery_app.send_task("app.workers.analysis_worker.run_analysis_task", args=[data])
+    try:
+        resp = requests.post(
+            "http://localhost:8000/api/v1/analysis/run-sync",
+            json={"output_dataset_id": data},
+            timeout=300,
+        )
+        resp.raise_for_status()
+        body = resp.json()
+        # When using run-sync, API returns { job_id, status, results }
+        return body.get("results", body)
+    except Exception as e:
+        st.error(f"Analysis failed: {e}")
+        raise
 
 # Page routing
 if page == "🏠 Home":

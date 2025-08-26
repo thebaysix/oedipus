@@ -149,11 +149,11 @@ def display_analysis_results(results: Dict[str, Any]):
     ])
     
     with tab1:
-        render_entropy_chart(results)
-        render_diversity_metrics(results)
+        render_entropy_chart(results, key="entropy_overview")
+        render_diversity_metrics(results, key="diversity_overview")
     
     with tab2:
-        render_entropy_chart(results)
+        render_entropy_chart(results, key="entropy_details")
         
         # Additional entropy insights
         st.subheader("Entropy Insights")
@@ -185,7 +185,7 @@ def display_analysis_results(results: Dict[str, Any]):
             )
     
     with tab3:
-        render_length_distribution(results)
+        render_length_distribution(results, key="length_distribution")
         
         # Additional length statistics
         char_metrics = results.get("character_metrics", {})

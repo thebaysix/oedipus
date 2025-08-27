@@ -59,7 +59,7 @@ st.markdown('<p class="subtitle">Observability & Analytics Infrastructure for AI
 st.sidebar.title("Navigation")
 page = st.sidebar.selectbox(
     "Choose a page:",
-    ["🏠 Home", "📊 Upload Data", "🔬 Analysis", "📈 Dashboard"]
+    ["🏠 Home", "📊 Upload Data", "🆚 Comparisons", "🔬 Analysis", "📈 Dashboard"]
 )
 
 # Sidebar: local mode toggle (optional)
@@ -248,6 +248,10 @@ elif page == "🔬 Analysis":
             results = submit_analysis(output_id)
             st.session_state.analysis_results = results
         render_analysis_dashboard(output_id)
+
+elif page == "🆚 Comparisons":
+    from components.comparison import render_comparison_creator
+    render_comparison_creator()
 
 elif page == "📈 Dashboard":
     st.header("📈 Analysis Dashboard")

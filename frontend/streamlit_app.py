@@ -247,7 +247,7 @@ elif page == "🔬 Analysis":
         with st.spinner("Running analysis..."):
             results = submit_analysis(output_id)
             st.session_state.analysis_results = results
-        render_analysis_dashboard(results)
+        render_analysis_dashboard(output_id)
 
 elif page == "📈 Dashboard":
     st.header("📈 Analysis Dashboard")

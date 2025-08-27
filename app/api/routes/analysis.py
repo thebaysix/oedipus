@@ -4,7 +4,7 @@ import uuid
 from ...core.database import get_db
 from ...services.analysis_service import AnalysisService
 from ...schemas.analysis import AnalysisJobCreate, AnalysisJobResponse
-from ...workers.analysis_worker import run_analysis_task
+from ...workers.analysis_worker import run_analysis_task, celery_app
 
 router = APIRouter(prefix="/api/v1/analysis", tags=["analysis"])
 
@@ -20,8 +20,11 @@ def create_analysis_job(
         service = AnalysisService(db)
         job = service.create_analysis_job(job_data)
         
-        # Queue the analysis task
-        task = run_analysis_task.delay(str(job.id))
+        # Queue the analysis task via Celery if available; otherwise, run in a background task
+        if celery_app:
+            celery_app.send_task("app.workers.analysis_worker.run_analysis_task", args=[str(job.id)])
+        else:
+            background_tasks.add_task(run_analysis_task, str(job.id))
         
         return job
     except ValueError as e:

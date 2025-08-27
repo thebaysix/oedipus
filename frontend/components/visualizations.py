@@ -47,7 +47,7 @@ def render_metrics_overview(results: Dict[str, Any]):
         )
 
 
-def render_entropy_chart(results: Dict[str, Any]):
+def render_entropy_chart(results: Dict[str, Any], key: str | None = None):
     """Render entropy-related visualizations."""
     st.subheader("🔍 Entropy Analysis")
     
@@ -78,10 +78,10 @@ def render_entropy_chart(results: Dict[str, Any]):
         showlegend=False
     )
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, use_container_width=True, key=key)
 
 
-def render_length_distribution(results: Dict[str, Any]):
+def render_length_distribution(results: Dict[str, Any], key: str | None = None):
     """Render output length distribution charts."""
     st.subheader("📏 Output Length Analysis")
     
@@ -128,10 +128,10 @@ def render_length_distribution(results: Dict[str, Any]):
     fig.update_yaxes(title_text="Count", row=1, col=1)
     fig.update_yaxes(title_text="Count", row=1, col=2)
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, use_container_width=True, key=key)
 
 
-def render_diversity_metrics(results: Dict[str, Any]):
+def render_diversity_metrics(results: Dict[str, Any], key: str | None = None):
     """Render diversity-related visualizations."""
     st.subheader("🌈 Output Diversity Metrics")
     
@@ -176,7 +176,7 @@ def render_diversity_metrics(results: Dict[str, Any]):
         showlegend=False
     )
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, use_container_width=True, key=key)
 
 
 def render_summary_table(results: Dict[str, Any]):

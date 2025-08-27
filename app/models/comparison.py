@@ -1,6 +1,6 @@
-from sqlalchemy import Column, String, DateTime, JSON, ForeignKey
+from sqlalchemy import Column, String, DateTime, JSON
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.sql import func
+from datetime import datetime
 import uuid
 from ..core.database import Base
 
@@ -10,16 +10,14 @@ class Comparison(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String, nullable=False)
-    # Parent input dataset for which outputs are compared
-    dataset_id = Column(UUID(as_uuid=True), ForeignKey("datasets.id"), nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
     # Configuration
-    output_dataset_ids = Column(JSON, nullable=False)  # List[UUID] as JSON array
-    alignment_key = Column(String, nullable=False, default="input_id")
-    comparison_config = Column(JSON, default=dict)
+    datasets = Column(JSON)  # References to existing datasets (UUIDs as strings)
+    alignment_key = Column(String, default="input_id")
+    comparison_config = Column(JSON)  # User preferences, thresholds
 
-    # Results/validation
-    alignment_stats = Column(JSON, default=dict)
-    status = Column(String, nullable=False, default="created")  # created/running/completed/failed
-
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    # Results
+    statistical_results = Column(JSON)  # Test outcomes, p-values, effect sizes (also holds alignment summary in Phase 1)
+    automated_insights = Column(JSON)  # List[str]
+    status = Column(String, default="pending")  # pending/running/completed/failed

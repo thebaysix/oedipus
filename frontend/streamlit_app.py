@@ -250,8 +250,8 @@ elif page == "🔬 Analysis":
         render_analysis_dashboard(output_id)
 
 elif page == "🆚 Comparisons":
-    from components.comparison import render_comparison_creator
-    render_comparison_creator()
+    from components.comparison import render_comparison_page
+    render_comparison_page()
 
 elif page == "📈 Dashboard":
     st.header("📈 Analysis Dashboard")

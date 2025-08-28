@@ -20,14 +20,14 @@ class ComparisonResponse(BaseModel):
     created_at: datetime
 
     # Configuration (as stored on the model per spec)
-    datasets: List[uuid.UUID]
-    alignment_key: str
-    comparison_config: Dict[str, Any]
+    datasets: List[uuid.UUID] = Field(default_factory=list)
+    alignment_key: str = "input_id"
+    comparison_config: Dict[str, Any] = Field(default_factory=dict)
 
     # Results
-    statistical_results: Dict[str, Any]
-    automated_insights: List[str]
-    status: str
+    statistical_results: Dict[str, Any] = Field(default_factory=dict)
+    automated_insights: List[str] = Field(default_factory=list)
+    status: str = "pending"
 
     class Config:
         from_attributes = True

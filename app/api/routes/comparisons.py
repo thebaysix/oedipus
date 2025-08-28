@@ -1,12 +1,27 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Dict, Any
 import uuid
 from ...core.database import get_db
 from ...services.comparison_service import ComparisonService
 from ...schemas.comparison import ComparisonCreate, ComparisonResponse
 
 router = APIRouter(prefix="/api/v1/comparisons", tags=["comparisons"])
+
+
+def _normalize_comp(c: Any) -> Dict[str, Any]:
+    """Convert ORM to response dict with safe defaults to avoid 500s from nulls/legacy rows."""
+    return {
+        "id": getattr(c, "id"),
+        "name": getattr(c, "name"),
+        "created_at": getattr(c, "created_at"),
+        "datasets": getattr(c, "datasets", None) or [],
+        "alignment_key": getattr(c, "alignment_key", None) or "input_id",
+        "comparison_config": getattr(c, "comparison_config", None) or {},
+        "statistical_results": getattr(c, "statistical_results", None) or {},
+        "automated_insights": getattr(c, "automated_insights", None) or [],
+        "status": getattr(c, "status", None) or "pending",
+    }
 
 
 @router.post("/create", response_model=ComparisonResponse, status_code=status.HTTP_201_CREATED)
@@ -17,7 +32,7 @@ def create_comparison(
     try:
         service = ComparisonService(db)
         comp = service.create_comparison(payload)
-        return comp  # Pydantic from_attributes handles ORM
+        return _normalize_comp(comp)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
@@ -31,7 +46,8 @@ def list_comparisons(
     db: Session = Depends(get_db)
 ):
     service = ComparisonService(db)
-    return service.list_comparisons(skip=skip, limit=limit)
+    comps = service.list_comparisons(skip=skip, limit=limit)
+    return [_normalize_comp(c) for c in comps]
 
 
 @router.get("/{comparison_id}", response_model=ComparisonResponse)
@@ -43,7 +59,7 @@ def get_comparison(
     comp = service.get_comparison(comparison_id)
     if not comp:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Comparison not found")
-    return comp
+    return _normalize_comp(comp)
 
 
 @router.delete("/{comparison_id}", status_code=status.HTTP_204_NO_CONTENT)

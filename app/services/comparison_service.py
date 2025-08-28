@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any
 import uuid
 from ..models.dataset import Dataset
 from ..models.output import OutputDataset
@@ -33,17 +33,17 @@ class ComparisonService:
             if o.dataset_id != payload.dataset_id:
                 raise ValueError("All output datasets must belong to the specified dataset")
 
-        # Basic alignment + validation
-        alignment_stats = self._compute_alignment_stats(dataset.inputs, outputs)
+        # Alignment result per Feature 1 spec
+        alignment_result = self._compute_alignment_result(dataset.inputs, outputs)
 
         comp = Comparison(
             name=payload.name,
-            dataset_id=payload.dataset_id,
-            output_dataset_ids=[str(i) for i in payload.output_dataset_ids],
+            datasets=[str(payload.dataset_id)] + [str(i) for i in payload.output_dataset_ids],
             alignment_key=payload.alignment_key,
             comparison_config=payload.comparison_config or {},
-            alignment_stats=alignment_stats,
-            status="created",
+            statistical_results={"alignment": alignment_result},
+            automated_insights=[],
+            status="pending",
         )
         self.db.add(comp)
         self.db.commit()
@@ -70,28 +70,51 @@ class ComparisonService:
         self.db.commit()
         return True
 
-    def _compute_alignment_stats(self, inputs: Dict[str, str], outputs: List[OutputDataset]) -> Dict[str, Any]:
+    def _compute_alignment_result(self, inputs: Dict[str, str], outputs: List[OutputDataset]) -> Dict[str, Any]:
         input_keys = set(inputs.keys())
-        matched_by_dataset: Dict[str, int] = {}
-        unmatched_inputs: Dict[str, List[str]] = {}
         matched_intersection = input_keys.copy()
 
+        # Build quick maps for outputs by dataset
+        outputs_by_dataset: Dict[str, Dict[str, List[str]]] = {}
+        dataset_name_by_id: Dict[str, str] = {}
         for o in outputs:
-            keys = set((o.outputs or {}).keys())
-            matched = keys & input_keys
-            matched_by_dataset[str(o.id)] = len(matched)
-            unmatched_inputs[str(o.id)] = sorted(list(input_keys - keys))
-            matched_intersection &= matched
+            ds_id = str(o.id)
+            outputs_by_dataset[ds_id] = o.outputs or {}
+            dataset_name_by_id[ds_id] = o.name
+            matched_intersection &= set((o.outputs or {}).keys())
 
         total_inputs = len(input_keys)
         matched_inputs = len(matched_intersection)
         coverage = (matched_inputs / total_inputs * 100.0) if total_inputs else 0.0
 
+        # Unmatched inputs: those missing in any selected dataset (union of differences)
+        unmatched_union = set()
+        for o in outputs:
+            keys = set((o.outputs or {}).keys())
+            unmatched_union |= (input_keys - keys)
+
+        # Construct aligned rows for matched intersection (cap to 200 rows to keep payload small)
+        aligned_rows = []
+        for input_id in list(matched_intersection)[:200]:
+            row_outputs: Dict[str, Any] = {}
+            row_meta: Dict[str, Any] = {}
+            for ds_id, ds_outputs in outputs_by_dataset.items():
+                name = dataset_name_by_id.get(ds_id, ds_id)
+                row_outputs[name] = ds_outputs.get(input_id, None)
+                row_meta[name] = {}
+            aligned_rows.append({
+                "inputId": input_id,
+                "inputText": inputs.get(input_id, ""),
+                "outputs": row_outputs,
+                "metadata": row_meta,
+            })
+
         return {
-            "total_inputs": total_inputs,
-            "datasets_included": len(outputs),
-            "matched_inputs": matched_inputs,
-            "coverage_percentage": round(coverage, 2),
-            "matched_by_dataset": matched_by_dataset,
-            "unmatched_inputs": unmatched_inputs,
+            "alignedRows": aligned_rows,
+            "unmatchedInputs": sorted(list(unmatched_union)),
+            "coverageStats": {
+                "totalInputs": total_inputs,
+                "matchedInputs": matched_inputs,
+                "coveragePercentage": round(coverage, 2),
+            },
         }

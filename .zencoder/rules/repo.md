@@ -6,25 +6,25 @@ alwaysApply: true
 # Oedipus MVP Information
 
 ## Summary
-Oedipus is an observability and analytics infrastructure for AI systems. The repository contains a fully implemented MVP (Phase 1) focused on bulk upload analysis of AI model outputs. The system provides comprehensive information-theoretic analysis of model behavior patterns without requiring custom evaluation scripts.
+Oedipus is an observability and analytics infrastructure for AI systems. The repository contains a fully implemented MVP focused on bulk upload analysis of AI model outputs. The system provides comprehensive information-theoretic analysis of model behavior patterns and now includes comparison capabilities for multiple model outputs.
 
 ## Structure
 - **app/**: Backend FastAPI application
-  - **api/**: API routes and endpoints
+  - **api/**: API routes and endpoints (datasets, outputs, analysis, comparisons)
   - **core/**: Configuration and database setup
   - **models/**: SQLAlchemy database models
   - **schemas/**: Pydantic validation schemas
   - **services/**: Business logic and analysis services
   - **workers/**: Celery background tasks
 - **frontend/**: Streamlit-based user interface
-  - **components/**: UI components (dashboard, upload, visualizations)
+  - **components/**: UI components (dashboard, upload, visualizations, comparison)
   - **utils/**: Helper functions for data processing
 - **scripts/**: Setup and startup scripts
 - **tests/**: Test suite for API and metrics
-- **alembic/**: Database migration scripts
+- **alembic/**: Database migration scripts with version history
 
 ## Language & Runtime
-**Language**: Python 3.11+
+**Language**: Python 3.13.7
 **Build System**: pip
 **Package Manager**: pip
 **Database**: PostgreSQL 15
@@ -41,11 +41,14 @@ Oedipus is an observability and analytics infrastructure for AI systems. The rep
 - Pandas 2.0.0+: Data manipulation
 - NumPy 1.24.0+: Numerical processing
 - Tiktoken 0.11.0+: Token counting
+- Redis 5.0.1: Caching and message broker
+- Pydantic 2.0.0+: Data validation
 
 **Development Dependencies**:
 - pytest 7.4.3: Testing framework
 - pytest-asyncio 0.21.1: Async testing
 - httpx 0.25.2: HTTP client for testing
+- python-dotenv 1.0.0: Environment variable management
 
 ## Build & Installation
 ```bash
@@ -67,7 +70,7 @@ alembic upgrade head
 **Services**:
 - PostgreSQL 15: Primary database
 - Redis 7-alpine: Caching and job queue
-**Configuration**: docker compose.yml defines services with health checks
+**Configuration**: docker-compose.yml defines services with health checks
 
 ## Testing
 **Framework**: pytest with pytest-asyncio
@@ -103,6 +106,15 @@ python scripts/start_frontend.py
 - **Visualization Dashboard**: Interactive metric visualizations
 - **Background Processing**: Celery-based task queue for analysis jobs
 - **Database Migrations**: Alembic for schema versioning
+- **Model Comparison**: Side-by-side comparison of multiple model outputs
+- **Outlier Detection**: Statistical analysis to identify anomalous outputs
+- **Alignment Analysis**: Coverage statistics and matched input tracking
+
+## API Endpoints
+- **Datasets**: `/api/v1/datasets/` - Create, list, and retrieve datasets
+- **Outputs**: `/api/v1/datasets/{id}/outputs` - Manage output datasets
+- **Analysis**: `/api/v1/analysis/run` - Run analysis jobs
+- **Comparisons**: `/api/v1/comparisons/` - Create and manage model comparisons
 
 ## Performance
 - 1,000 input/output pairs: < 5 minutes

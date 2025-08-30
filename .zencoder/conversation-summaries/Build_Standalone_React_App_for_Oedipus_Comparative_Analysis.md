@@ -1,7 +1,7 @@
 ---
 timestamp: 2025-08-28T04:57:32.918622
 initial_query: We've reached a good checkpoint with the demo version of this tool.
-As a next step, I'd like you to build a **standalone React app** that covers the Comparative Analysis feature, which is the key differentiating feature of Oedipus. We already have a demo version of this in the streamlit_app, but that is for demo purposes only. Now, we want a more professional React/TS implementation with a **simple and snappy** single page where one can upload (drag and drop) input and completion datasets and see the statistical metrics and explore dataset differences and gain insights.
+As a next step, I'd like you to build a **standalone React app** that covers the Comparative Analysis feature, which is the key differentiating feature of Oedipus. We already have a demo version of this in the streamlit_app, but that is for demo purposes only. Now, we want a more professional React/TS implementation with a **simple and snappy** single page where one can upload (drag and drop) prompt and completion datasets and see the statistical metrics and explore dataset differences and gain insights.
 Note that much of this implementation already exists in streamlit, and the backend should remain the same, the key ask here is to make the new standalone snappy React frontend app (moving away from streamilt) that focuses on nailing this feature alone.
 Here is the full feature spec:
 # Oedipus Comparative Analysis Feature
@@ -172,7 +172,7 @@ total_messages: 82
 
 ## Initial Query
 We've reached a good checkpoint with the demo version of this tool.
-As a next step, I'd like you to build a **standalone React app** that covers the Comparative Analysis feature, which is the key differentiating feature of Oedipus. We already have a demo version of this in the streamlit_app, but that is for demo purposes only. Now, we want a more professional React/TS implementation with a **simple and snappy** single page where one can upload (drag and drop) input and completion datasets and see the statistical metrics and explore dataset differences and gain insights.
+As a next step, I'd like you to build a **standalone React app** that covers the Comparative Analysis feature, which is the key differentiating feature of Oedipus. We already have a demo version of this in the streamlit_app, but that is for demo purposes only. Now, we want a more professional React/TS implementation with a **simple and snappy** single page where one can upload (drag and drop) prompt and completion datasets and see the statistical metrics and explore dataset differences and gain insights.
 Note that much of this implementation already exists in streamlit, and the backend should remain the same, the key ask here is to make the new standalone snappy React frontend app (moving away from streamilt) that focuses on nailing this feature alone.
 Here is the full feature spec:
 # Oedipus Comparative Analysis Feature
@@ -346,7 +346,7 @@ I began by exploring the existing codebase to understand the current Streamlit i
 
 I then created a complete React application from scratch using modern development practices. The tech stack includes React 18 with TypeScript, Vite for build tooling, TanStack Query for server state management, Zustand for client state, Recharts for visualizations, and Tailwind CSS for styling. The application follows a clean component architecture organized into logical folders: DatasetUpload, ComparisonTable, MetricsComparison, and StatisticalTests.
 
-The application implements a three-step wizard workflow: 1) Upload datasets with drag-and-drop functionality and real-time validation, 2) Create comparisons by selecting input and completion datasets, and 3) View comprehensive results including statistical summaries, interactive charts, and aligned data tables. Key features include automatic file type detection, CSV parsing with Papa Parse, statistical significance testing, effect size calculations, and confidence intervals.
+The application implements a three-step wizard workflow: 1) Upload datasets with drag-and-drop functionality and real-time validation, 2) Create comparisons by selecting prompt and completion datasets, and 3) View comprehensive results including statistical summaries, interactive charts, and aligned data tables. Key features include automatic file type detection, CSV parsing with Papa Parse, statistical significance testing, effect size calculations, and confidence intervals.
 
 I created comprehensive TypeScript types to ensure type safety across the application, custom hooks for upload and comparison management, utility functions for API communication and data processing, and reusable React components with proper state management. The main App component orchestrates the entire user flow with a visual step indicator and conditional rendering based on the current step.
 

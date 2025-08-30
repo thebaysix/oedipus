@@ -2,7 +2,7 @@
 timestamp: 2025-08-28T04:57:43.963294
 initial_query: Continue. You were in the middle of request:
 We've reached a good checkpoint with the demo version of this tool.
-As a next step, I'd like you to build a **standalone React app** that covers the Comparative Analysis feature, which is the key differentiating feature of Oedipus. We already have a demo version of this in the streamlit_app, but that is for demo purposes only. Now, we want a more professional React/TS implementation with a **simple and snappy** single page where one can upload (drag and drop) input and completion datasets and see the statistical metrics and explore dataset differences and gain insights.
+As a next step, I'd like you to build a **standalone React app** that covers the Comparative Analysis feature, which is the key differentiating feature of Oedipus. We already have a demo version of this in the streamlit_app, but that is for demo purposes only. Now, we want a more professional React/TS implementation with a **simple and snappy** single page where one can upload (drag and drop) prompt and completion datasets and see the statistical metrics and explore dataset differences and gain insights.
 Note that much of this implementation already exists in streamlit, and the backend should remain the same, the key ask here is to make the new standalone snappy React frontend app (moving away from streamilt) that focuses on nailing this feature alone.
 Here is the full feature spec:
 # Oedipus Comparative Analysis Feature
@@ -175,7 +175,7 @@ total_messages: 82
 ## Initial Query
 Continue. You were in the middle of request:
 We've reached a good checkpoint with the demo version of this tool.
-As a next step, I'd like you to build a **standalone React app** that covers the Comparative Analysis feature, which is the key differentiating feature of Oedipus. We already have a demo version of this in the streamlit_app, but that is for demo purposes only. Now, we want a more professional React/TS implementation with a **simple and snappy** single page where one can upload (drag and drop) input and completion datasets and see the statistical metrics and explore dataset differences and gain insights.
+As a next step, I'd like you to build a **standalone React app** that covers the Comparative Analysis feature, which is the key differentiating feature of Oedipus. We already have a demo version of this in the streamlit_app, but that is for demo purposes only. Now, we want a more professional React/TS implementation with a **simple and snappy** single page where one can upload (drag and drop) prompt and completion datasets and see the statistical metrics and explore dataset differences and gain insights.
 Note that much of this implementation already exists in streamlit, and the backend should remain the same, the key ask here is to make the new standalone snappy React frontend app (moving away from streamilt) that focuses on nailing this feature alone.
 Here is the full feature spec:
 # Oedipus Comparative Analysis Feature

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { clsx } from 'clsx';
 import { 
   Upload, 
@@ -30,6 +30,7 @@ import {
   useCreateComparison, 
   useComparison 
 } from './hooks/useComparison';
+import { useQueryClient } from '@tanstack/react-query';
 
 // Types
 import { AlignmentResult, StatisticalMetric } from './types/comparison';
@@ -50,8 +51,18 @@ function App() {
     isUploading 
   } = useUpload();
   
+  const queryClient = useQueryClient();
   const { data: datasets = [], error: datasetsError } = useDatasets();
-  const { data: allOutputDatasets = [] } = useAllOutputDatasets(datasets.map(d => d.id));
+  const { data: allOutputDatasets = [], error: outputDatasetsError, isLoading: isLoadingOutputs, refetch: refetchOutputs } = useAllOutputDatasets(datasets.map(d => d.id));
+  
+  // Auto-refetch outputs when datasets are first loaded (for initial page load)
+  useEffect(() => {
+    if (datasets.length > 0) {
+      refetchOutputs();
+    }
+  }, [datasets.length, refetchOutputs]);
+  
+
   
   const createComparisonMutation = useCreateComparison();
   const { data: comparison, isLoading: isLoadingComparison } = useComparison(selectedComparison);
@@ -127,7 +138,7 @@ function App() {
     <div className="flex items-center justify-center mb-8">
       <div className="flex items-center space-x-4">
         {[
-          { key: 'upload', label: 'Upload Data', icon: Upload },
+          { key: 'upload', label: 'Upload Prompts & Completions', icon: Upload },
           { key: 'compare', label: 'Create Comparison', icon: GitCompare },
           { key: 'results', label: 'View Results', icon: BarChart3 },
         ].map(({ key, label, icon: Icon }, index) => (
@@ -171,9 +182,9 @@ function App() {
   const renderUploadStep = () => (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Upload Your Datasets</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Upload Your Prompts & Completions</h2>
         <p className="text-gray-600">
-          Upload input datasets and multiple output datasets to compare model performance
+          Upload prompt datasets and multiple completion datasets to compare model performance
         </p>
       </div>
 
@@ -238,7 +249,7 @@ function App() {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Available Datasets
+              Available Prompt & Completion Datasets
             </label>
             <div className="space-y-2">
               {/* Input Datasets */}
@@ -246,9 +257,9 @@ function App() {
                 <div key={dataset.id} className="flex items-center gap-3 p-3 border rounded">
                   <Database className="w-5 h-5 text-blue-500" />
                   <div>
-                    <div className="font-medium">{dataset.name} <span className="text-xs bg-blue-100 text-blue-800 px-1 rounded">INPUT</span></div>
+                    <div className="font-medium">{dataset.name} <span className="text-xs bg-blue-100 text-blue-800 px-1 rounded">PROMPTS</span></div>
                     <div className="text-sm text-gray-500">
-                      {Object.keys(dataset.inputs).length} inputs • Created {new Date(dataset.created_at).toLocaleDateString()}
+                      {Object.keys(dataset.inputs).length} prompts • Created {new Date(dataset.created_at).toLocaleDateString()}
                     </div>
                   </div>
                 </div>
@@ -259,9 +270,9 @@ function App() {
                 <div key={outputDataset.id} className="flex items-center gap-3 p-3 border rounded">
                   <Database className="w-5 h-5 text-green-500" />
                   <div>
-                    <div className="font-medium">{outputDataset.name} <span className="text-xs bg-green-100 text-green-800 px-1 rounded">OUTPUT</span></div>
+                    <div className="font-medium">{outputDataset.name} <span className="text-xs bg-green-100 text-green-800 px-1 rounded">COMPLETIONS</span></div>
                     <div className="text-sm text-gray-500">
-                      {outputDataset.metadata?.total_outputs || 0} outputs • Created {new Date(outputDataset.created_at).toLocaleDateString()}
+                      {outputDataset.metadata?.total_outputs || 0} completions • Created {new Date(outputDataset.created_at).toLocaleDateString()}
                     </div>
                   </div>
                 </div>
@@ -269,10 +280,12 @@ function App() {
             </div>
           </div>
 
+
+
           <div className="pt-4">
             <button
               onClick={handleCreateComparison}
-              disabled={createComparisonMutation.isPending || datasets.length === 0 || allOutputDatasets.length < 2}
+              disabled={createComparisonMutation.isPending || datasets.length === 0 || isLoadingOutputs || allOutputDatasets.length < 2}
               className={clsx(
                 'w-full px-4 py-2 rounded-lg font-medium transition-colors',
                 'bg-primary-500 text-white hover:bg-primary-600',
@@ -292,11 +305,15 @@ function App() {
             {/* Status message */}
             <div className="text-sm text-gray-600 mt-2">
               {datasets.length === 0 ? (
-                <span className="text-orange-600">⚠ Need at least 1 input dataset</span>
+                <span className="text-orange-600">⚠ Need at least 1 prompt dataset</span>
+              ) : isLoadingOutputs ? (
+                <span className="text-blue-600">🔄 Loading completions...</span>
+              ) : outputDatasetsError ? (
+                <span className="text-red-600">❌ Error loading completions</span>
               ) : allOutputDatasets.length < 2 ? (
-                <span className="text-orange-600">⚠ Need at least 2 output datasets</span>
+                <span className="text-orange-600">⚠ Need at least 2 completion datasets (currently {allOutputDatasets.length})</span>
               ) : (
-                <span className="text-green-600">✓ Ready to compare {allOutputDatasets.length} output datasets</span>
+                <span className="text-green-600">✓ Ready to compare {allOutputDatasets.length} completion datasets</span>
               )}
             </div>
           </div>

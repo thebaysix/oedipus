@@ -132,18 +132,25 @@ Main App | Diagnostic | Simple Test | Debug Hooks
 - **Color-coded status indicators** for quick identification
 
 **Functionality**:
-- **useDatasets() Hook Analysis**: Real-time hook state inspection
+- **useDatasets() Hook Analysis**: Real-time hook state inspection for prompt datasets
+- **useAllOutputDatasets() Hook Analysis**: Real-time hook state inspection for completion datasets
 - **Loading State Monitoring**: Track async operation states
 - **Error State Debugging**: Detailed error information display
 - **Data Inspection**: Raw API response examination
-- **Hook Performance Monitoring**: Loading times and retry attempts
+- **Manual Testing Tools**: Direct API test and refetch buttons
 
 **State Information Displayed**:
 - **Loading**: Current async operation status
 - **Error**: Detailed error messages and stack traces
-- **Datasets Count**: Number of loaded datasets
-- **Raw Data**: Complete API responses
+- **Prompts Count**: Number of loaded prompt datasets
+- **Completions Count**: Number of loaded completion datasets
+- **Raw Data**: Complete API responses for both hooks
 - **Hook Lifecycle**: State changes and transitions
+
+**Interactive Tools**:
+- **Refetch Completions**: Manual trigger to reload completion datasets
+- **Test Direct API**: Bypass React Query to test raw API connectivity
+- **Bug Fix Documentation**: Records of recent fixes and their solutions
 
 **When to Use**:
 - API integration debugging
@@ -151,16 +158,10 @@ Main App | Diagnostic | Simple Test | Debug Hooks
 - Data loading problems
 - Hook performance analysis
 - Backend integration testing
+- Investigating caching issues
 
-**Debug Output Includes**:
-```javascript
-{
-  "isLoading": false,
-  "isError": false,
-  "datasets": [...],
-  "error": null
-}
-```
+**Recent Fixes Documented**:
+- **Automatic Completion Loading**: Fixed React Query caching issue that prevented completion datasets from loading automatically after upload
 
 ## Technical Stack
 

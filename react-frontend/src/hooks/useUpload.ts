@@ -22,7 +22,10 @@ export const useUpload = () => {
       return apiClient.postFormData<OutputDataset>(`/api/v1/datasets/${datasetId}/outputs/upload`, formData);
     },
     onSuccess: () => {
+      // Invalidate and refetch relevant queries after output upload
       queryClient.invalidateQueries({ queryKey: ['datasets'] });
+      queryClient.invalidateQueries({ queryKey: ['all-outputs'] });
+      queryClient.refetchQueries({ queryKey: ['all-outputs'] });
     }
   });
 

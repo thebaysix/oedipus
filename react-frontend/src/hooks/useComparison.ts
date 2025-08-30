@@ -64,18 +64,32 @@ export const useDeleteComparison = () => {
 
 export const useAllOutputDatasets = (datasetIds: string[]) => {
   return useQuery({
-    queryKey: ['all-outputs', datasetIds],
+    queryKey: ['all-outputs', ...datasetIds.sort()], // Spread and sort for stable key
     queryFn: async () => {
-      if (!datasetIds.length) return [];
+      if (!datasetIds.length) {
+        return [];
+      }
       
-      const results = await Promise.all(
-        datasetIds.map(datasetId => 
-          apiClient.get<OutputDataset[]>(`/api/v1/datasets/${datasetId}/outputs`)
-        )
-      );
-      
-      return results.flat();
+      try {
+        const results = await Promise.all(
+          datasetIds.map(async (datasetId) => {
+            const result = await apiClient.get<OutputDataset[]>(`/api/v1/datasets/${datasetId}/outputs`);
+            return result;
+          })
+        );
+        
+        const flattened = results.flat();
+        return flattened;
+      } catch (error) {
+        console.error('Error fetching output datasets:', error);
+        throw error;
+      }
     },
     enabled: datasetIds.length > 0,
+    staleTime: 0, // Don't cache - always fetch fresh data
+    cacheTime: 0, // Don't keep in cache
+    retry: 2,
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
   });
 };

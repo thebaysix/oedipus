@@ -1,9 +1,12 @@
 export interface Dataset {
   id: string;
   name: string;
+  user_id: string;
   created_at: string;
+  inputs: Record<string, string>; // mapping input_id -> input_text
+  metadata: Record<string, any>;
   description?: string;
-  input_count: number;
+  input_count?: number; // computed field
 }
 
 export interface OutputDataset {
@@ -11,7 +14,9 @@ export interface OutputDataset {
   name: string;
   dataset_id: string;
   created_at: string;
-  output_count: number;
+  outputs: Record<string, string[]>; // mapping input_id -> output_texts
+  metadata: Record<string, any>;
+  output_count?: number; // computed field
 }
 
 export interface ComparisonCreate {

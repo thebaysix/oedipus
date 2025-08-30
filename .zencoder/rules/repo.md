@@ -120,3 +120,6 @@ python scripts/start_frontend.py
 - 1,000 input/output pairs: < 5 minutes
 - 10,000 inputs with multiple outputs: < 15 minutes
 - Complex analysis with all metrics: < 2 minutes
+
+## Testing
+**targetFramework**: Playwright

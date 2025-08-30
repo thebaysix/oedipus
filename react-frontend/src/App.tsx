@@ -14,7 +14,7 @@ import {
 // Components
 import { DragDropUploader } from './components/DatasetUpload/DragDropUploader';
 import { DatasetPreview } from './components/DatasetUpload/DatasetPreview';
-import { ValidationMessages } from './components/DatasetUpload/ValidationMessages';
+
 import { AlignedDataTable } from './components/ComparisonTable/AlignedDataTable';
 import { StatisticalSummary } from './components/MetricsComparison/StatisticalSummary';
 import { ComparisonCharts } from './components/MetricsComparison/ComparisonCharts';
@@ -26,12 +26,13 @@ import { ReportGenerator } from './components/Export/ReportGenerator';
 import { useUpload } from './hooks/useUpload';
 import { 
   useDatasets, 
+  useAllOutputDatasets,
   useCreateComparison, 
   useComparison 
 } from './hooks/useComparison';
 
 // Types
-import { Comparison, AlignmentResult, StatisticalMetric } from './types/comparison';
+import { AlignmentResult, StatisticalMetric } from './types/comparison';
 
 type Step = 'upload' | 'compare' | 'results';
 
@@ -50,6 +51,8 @@ function App() {
   } = useUpload();
   
   const { data: datasets = [], error: datasetsError } = useDatasets();
+  const { data: allOutputDatasets = [] } = useAllOutputDatasets(datasets.map(d => d.id));
+  
   const createComparisonMutation = useCreateComparison();
   const { data: comparison, isLoading: isLoadingComparison } = useComparison(selectedComparison);
 
@@ -90,14 +93,8 @@ function App() {
   const metrics: StatisticalMetric[] = comparison?.statistical_results?.metrics || [];
 
   const handleCreateComparison = async () => {
-    const inputDatasets = datasets.filter(d => 
-      files.some(f => f.type === 'input' && f.status === 'completed')
-    );
-    const outputDatasets = datasets.filter(d => 
-      files.some(f => f.type === 'output' && f.status === 'completed')
-    );
-
-    if (inputDatasets.length === 0 || outputDatasets.length < 2) {
+    // Check if we have at least 1 input dataset and 2 output datasets
+    if (datasets.length === 0 || allOutputDatasets.length < 2) {
       alert('Please upload at least one input dataset and two output datasets');
       return;
     }
@@ -105,8 +102,8 @@ function App() {
     try {
       const result = await createComparisonMutation.mutateAsync({
         name: `Comparison ${new Date().toLocaleString()}`,
-        dataset_id: inputDatasets[0].id,
-        output_dataset_ids: outputDatasets.slice(0, 2).map(d => d.id), // Compare first two outputs
+        dataset_id: datasets[0].id,
+        output_dataset_ids: allOutputDatasets.slice(0, 2).map(d => d.id), // Compare first two outputs
         alignment_key: 'input_id'
       });
       
@@ -244,13 +241,27 @@ function App() {
               Available Datasets
             </label>
             <div className="space-y-2">
+              {/* Input Datasets */}
               {datasets.slice(-5).map(dataset => (
                 <div key={dataset.id} className="flex items-center gap-3 p-3 border rounded">
                   <Database className="w-5 h-5 text-blue-500" />
                   <div>
-                    <div className="font-medium">{dataset.name}</div>
+                    <div className="font-medium">{dataset.name} <span className="text-xs bg-blue-100 text-blue-800 px-1 rounded">INPUT</span></div>
                     <div className="text-sm text-gray-500">
-                      {dataset.input_count} inputs • Created {new Date(dataset.created_at).toLocaleDateString()}
+                      {Object.keys(dataset.inputs).length} inputs • Created {new Date(dataset.created_at).toLocaleDateString()}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              
+              {/* Output Datasets */}
+              {allOutputDatasets.map(outputDataset => (
+                <div key={outputDataset.id} className="flex items-center gap-3 p-3 border rounded">
+                  <Database className="w-5 h-5 text-green-500" />
+                  <div>
+                    <div className="font-medium">{outputDataset.name} <span className="text-xs bg-green-100 text-green-800 px-1 rounded">OUTPUT</span></div>
+                    <div className="text-sm text-gray-500">
+                      {outputDataset.metadata?.total_outputs || 0} outputs • Created {new Date(outputDataset.created_at).toLocaleDateString()}
                     </div>
                   </div>
                 </div>
@@ -261,7 +272,7 @@ function App() {
           <div className="pt-4">
             <button
               onClick={handleCreateComparison}
-              disabled={createComparisonMutation.isPending || datasets.length < 3}
+              disabled={createComparisonMutation.isPending || datasets.length === 0 || allOutputDatasets.length < 2}
               className={clsx(
                 'w-full px-4 py-2 rounded-lg font-medium transition-colors',
                 'bg-primary-500 text-white hover:bg-primary-600',
@@ -277,6 +288,17 @@ function App() {
                 'Create Comparison'
               )}
             </button>
+            
+            {/* Status message */}
+            <div className="text-sm text-gray-600 mt-2">
+              {datasets.length === 0 ? (
+                <span className="text-orange-600">⚠ Need at least 1 input dataset</span>
+              ) : allOutputDatasets.length < 2 ? (
+                <span className="text-orange-600">⚠ Need at least 2 output datasets</span>
+              ) : (
+                <span className="text-green-600">✓ Ready to compare {allOutputDatasets.length} output datasets</span>
+              )}
+            </div>
           </div>
         </div>
       </div>

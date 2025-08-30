@@ -61,3 +61,21 @@ export const useDeleteComparison = () => {
     },
   });
 };
+
+export const useAllOutputDatasets = (datasetIds: string[]) => {
+  return useQuery({
+    queryKey: ['all-outputs', datasetIds],
+    queryFn: async () => {
+      if (!datasetIds.length) return [];
+      
+      const results = await Promise.all(
+        datasetIds.map(datasetId => 
+          apiClient.get<OutputDataset[]>(`/api/v1/datasets/${datasetId}/outputs`)
+        )
+      );
+      
+      return results.flat();
+    },
+    enabled: datasetIds.length > 0,
+  });
+};

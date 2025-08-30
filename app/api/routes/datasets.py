@@ -1,7 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 from sqlalchemy.orm import Session
 from typing import List
 import uuid
+import csv
+import io
 from ...core.database import get_db
 from ...services.dataset_service import DatasetService
 from ...schemas.dataset import DatasetCreate, DatasetResponse
@@ -10,6 +12,77 @@ router = APIRouter(prefix="/api/v1/datasets", tags=["datasets"])
 
 # Mock user ID for MVP (in production, this would come from authentication)
 MOCK_USER_ID = uuid.uuid4()
+
+
+@router.post("/upload", response_model=DatasetResponse, status_code=status.HTTP_201_CREATED)
+async def upload_dataset(
+    file: UploadFile = File(...),
+    name: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    """Upload a dataset from CSV file."""
+    try:
+        # Validate file type
+        if not file.filename.lower().endswith('.csv'):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="File must be a CSV file"
+            )
+        
+        # Read and parse CSV
+        content = await file.read()
+        csv_content = content.decode('utf-8')
+        
+        # Parse CSV data
+        inputs = {}
+        reader = csv.DictReader(io.StringIO(csv_content))
+        
+        # Validate required columns
+        if 'input_id' not in reader.fieldnames or 'input_text' not in reader.fieldnames:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="CSV must have 'input_id' and 'input_text' columns"
+            )
+        
+        for row in reader:
+            input_id = row.get('input_id', '').strip()
+            input_text = row.get('input_text', '').strip()
+            
+            if not input_id or not input_text:
+                continue  # Skip empty rows
+                
+            inputs[input_id] = input_text
+        
+        if not inputs:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No valid input data found in CSV"
+            )
+        
+        # Create dataset using existing service
+        dataset_create = DatasetCreate(
+            name=name,
+            inputs=inputs,
+            metadata={
+                "source_file": file.filename,
+                "total_inputs": len(inputs)
+            }
+        )
+        
+        service = DatasetService(db)
+        db_dataset = service.create_dataset(dataset_create, MOCK_USER_ID)
+        return DatasetResponse.from_orm_with_alias(db_dataset)
+        
+    except UnicodeDecodeError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="File encoding error. Please ensure the CSV is UTF-8 encoded"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
 
 
 @router.post("/", response_model=DatasetResponse, status_code=status.HTTP_201_CREATED)

@@ -10,7 +10,7 @@ export const useUpload = () => {
 
   const createDatasetMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      return apiClient.postFormData<Dataset>('/api/v1/datasets/', data);
+      return apiClient.postFormData<Dataset>('/api/v1/datasets/upload', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['datasets'] });
@@ -19,7 +19,7 @@ export const useUpload = () => {
 
   const createOutputDatasetMutation = useMutation({
     mutationFn: async ({ datasetId, formData }: { datasetId: string, formData: FormData }) => {
-      return apiClient.postFormData<OutputDataset>(`/api/v1/datasets/${datasetId}/outputs`, formData);
+      return apiClient.postFormData<OutputDataset>(`/api/v1/datasets/${datasetId}/outputs/upload`, formData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['datasets'] });

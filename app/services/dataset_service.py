@@ -45,7 +45,7 @@ class DatasetService:
         if not dataset:
             raise ValueError(f"Dataset {dataset_id} not found")
         
-        # Validate that output keys match input keys
+        # Validate that output keys match prompt keys
         input_keys = set(dataset.prompts.keys())
         output_keys = set(output_data.completions.keys())
         

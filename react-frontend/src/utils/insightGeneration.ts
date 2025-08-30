@@ -221,7 +221,7 @@ export class InsightGenerator {
       insights.push({
         type: 'recommendation',
         title: 'Improve Data Alignment',
-        description: 'Low data coverage limits analysis reliability. Ensure consistent input identifiers across datasets or collect additional aligned samples.',
+        description: 'Low data coverage limits analysis reliability. Ensure consistent prompt identifiers across datasets or collect additional aligned samples.',
         impact: 'medium',
         confidence: 0.8,
         metrics: ['alignment_coverage']

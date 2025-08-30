@@ -152,7 +152,7 @@ interface AlignedRow {
 **Validation Rules**:
 - Minimum 10 aligned prompts for statistical significance
 - Maximum 50,000 rows per dataset (performance constraint)
-- Required fields: input identifier and output content
+- Required fields: prompt identifier and completion content
 - Optional fields: model version, timestamp, custom scores
 ### 2. Side-by-Side Comparison Interface
 **Interactive Data Table**:
@@ -325,7 +325,7 @@ interface AlignedRow {
 **Validation Rules**:
 - Minimum 10 aligned prompts for statistical significance
 - Maximum 50,000 rows per dataset (performance constraint)
-- Required fields: input identifier and output content
+- Required fields: prompt identifier and completion content
 - Optional fields: model version, timestamp, custom scores
 ### 2. Side-by-Side Comparison Interface
 **Interactive Data Table**:

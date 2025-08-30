@@ -5,7 +5,7 @@ from app.services.metrics.empowerment import calculate_empowerment, calculate_ou
 from app.services.metrics.basic_metrics import calculate_character_metrics, calculate_token_metrics
 
 def test_input_entropy():
-    """Test input entropy calculation."""
+    """Test prompt entropy calculation."""
     prompts = {
         "input_1": "What is AI?",
         "input_2": "What is AI?",  # Duplicate

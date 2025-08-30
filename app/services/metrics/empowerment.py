@@ -14,7 +14,7 @@ def calculate_empowerment(prompts: Dict[str, str], completions: Dict[str, List[s
     if not prompts or not completions:
         return 0.0
     
-    # Group completions by input
+    # Group completions by prompt
     input_output_groups = defaultdict(list)
     for input_id, input_text in prompts.items():
         if input_id in completions:
@@ -26,23 +26,23 @@ def calculate_empowerment(prompts: Dict[str, str], completions: Dict[str, List[s
     total_empowerment = 0.0
     total_weight = 0.0
     
-    # Calculate empowerment for each input group
+    # Calculate empowerment for each prompt group
     for input_text, output_list in input_output_groups.items():
         if len(output_list) < 2:
             continue
         
-        # Calculate diversity of completions for this input
+        # Calculate diversity of completions for this prompt
         output_counts = Counter(output_list)
         group_size = len(output_list)
         
-        # Calculate entropy of output distribution for this input
+        # Calculate entropy of output distribution for this prompt
         output_entropy = 0.0
         for count in output_counts.values():
             p = count / group_size
             if p > 0:
                 output_entropy -= p * np.log2(p)
         
-        # Weight by frequency of this input
+        # Weight by frequency of this prompt
         weight = group_size
         total_empowerment += weight * output_entropy
         total_weight += weight
@@ -64,7 +64,7 @@ def calculate_output_diversity_metrics(prompts: Dict[str, str], completions: Dic
     
     empowerment = calculate_empowerment(prompts, completions)
     
-    # Calculate average number of completions per input
+    # Calculate average number of completions per prompt
     output_counts = [len(completions.get(input_id, [])) for input_id in prompts.keys()]
     avg_outputs = np.mean(output_counts) if output_counts else 0.0
     

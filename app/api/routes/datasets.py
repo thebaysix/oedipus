@@ -56,7 +56,7 @@ async def upload_dataset(
         if not prompts:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="No valid input data found in CSV"
+                detail="No valid prompt data found in CSV"
             )
         
         # Create dataset using existing service

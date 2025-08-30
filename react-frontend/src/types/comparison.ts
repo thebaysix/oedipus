@@ -63,7 +63,7 @@ export interface UploadedFile {
   preview: string[][];
   headers: string[];
   rowCount: number;
-  type: 'input' | 'output';
+  type: 'prompt' | 'output';
   status: 'pending' | 'uploading' | 'completed' | 'error';
   error?: string;
 }

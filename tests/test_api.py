@@ -103,7 +103,7 @@ def test_analysis_job_creation():
     # Create dataset and completion dataset first
     dataset_data = {
         "name": "Analysis Test Dataset",
-        "prompts": {"input_1": "Test input"}
+        "prompts": {"input_1": "Test prompt"}
     }
     
     dataset_response = client.post("/api/v1/datasets/", json=dataset_data)

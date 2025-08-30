@@ -44,7 +44,7 @@ export const useUpload = () => {
             preview: [],
             headers: [],
             rowCount: 0,
-            type: 'input',
+            type: 'prompt',
             status: 'error',
             error: parseResult.errors.join(', ')
           });
@@ -58,16 +58,16 @@ export const useUpload = () => {
         const isInput = inputErrors.length === 0;
         const isOutput = outputErrors.length === 0;
         
-        let fileType: 'input' | 'output' = 'input';
+        let fileType: 'prompt' | 'output' = 'prompt';
         let validationErrors: string[] = [];
         
         if (isInput && !isOutput) {
-          fileType = 'input';
+          fileType = 'prompt';
         } else if (isOutput && !isInput) {
           fileType = 'output';
         } else if (isInput && isOutput) {
-          // Both valid, default to input
-          fileType = 'input';
+          // Both valid, default to prompt
+          fileType = 'prompt';
         } else {
           // Neither valid
           validationErrors = [...inputErrors, ...outputErrors];
@@ -92,7 +92,7 @@ export const useUpload = () => {
           preview: [],
           headers: [],
           rowCount: 0,
-          type: 'input',
+          type: 'prompt',
           status: 'error',
           error: error instanceof Error ? error.message : 'Unknown error'
         });
@@ -106,11 +106,11 @@ export const useUpload = () => {
     setFiles(prev => prev.filter(f => f.id !== fileId));
   }, []);
 
-  const updateFileType = useCallback((fileId: string, type: 'input' | 'output') => {
+  const updateFileType = useCallback((fileId: string, type: 'prompt' | 'output') => {
     setFiles(prev => prev.map(f => {
       if (f.id === fileId) {
         // Re-validate with new type
-        const validationErrors = type === 'input' 
+        const validationErrors = type === 'prompt' 
           ? validatePromptDataset(f.headers)
           : validateCompletionDataset(f.headers);
         
@@ -138,7 +138,7 @@ export const useUpload = () => {
       formData.append('file', file.file);
       formData.append('name', file.name.replace('.csv', ''));
 
-      if (file.type === 'input') {
+      if (file.type === 'prompt') {
         const result = await createDatasetMutation.mutateAsync(formData);
         setFiles(prev => prev.map(f => 
           f.id === fileId ? { ...f, status: 'completed' } : f

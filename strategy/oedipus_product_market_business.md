@@ -3,7 +3,7 @@
 ## **Vision**
 Oedipus is observability and analytics infrastructure for AI systems. It provides developers and teams with a standardized evaluation layer for LLMs and agent-based systems. By shortening the feedback loop between deployment, evaluation, and iteration, Oedipus makes it easy to compare models, track regressions, and build trustworthy AI products without reinventing the wheel.
 
-Instead of bespoke scripts and ad-hoc dashboards, Oedipus offers a repeatable, rigorous framework for analyzing AI behavior — from raw outputs to complex agent traces.  
+Instead of bespoke scripts and ad-hoc dashboards, Oedipus offers a repeatable, rigorous framework for analyzing AI behavior — from raw completions to complex agent traces.  
 
 ---
 
@@ -31,7 +31,7 @@ Instead of bespoke scripts and ad-hoc dashboards, Oedipus offers a repeatable, r
 ---
 
 ## **Comparison to Existing Tools**
-- **Weights & Biases (W&B):** Great for training-time experiment tracking, but not designed for post-deployment LLM/agent evaluation. Oedipus complements W&B by focusing on outputs, traces, and human annotations.  
+- **Weights & Biases (W&B):** Great for training-time experiment tracking, but not designed for post-deployment LLM/agent evaluation. Oedipus complements W&B by focusing on completions, traces, and human annotations.  
 - **Tableau/BI tools:** Flexible for visualization but lack domain-specific metrics, schema support, or agent observability. Oedipus solves the “AI-native” evaluation problem.  
 - **Custom scripts/notebooks:** Ubiquitous but costly to maintain, error-prone, and non-standardized. Oedipus replaces them with an opinionated but flexible infra layer.  
 

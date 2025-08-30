@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../utils/api';
-import { Dataset, OutputDataset, Comparison, ComparisonCreate } from '../types/comparison';
+import { Dataset, CompletionDataset, Comparison, ComparisonCreate } from '../types/comparison';
 
 export const useDatasets = () => {
   return useQuery({
@@ -11,10 +11,10 @@ export const useDatasets = () => {
   });
 };
 
-export const useOutputDatasets = (datasetId: string) => {
+export const useCompletionDatasets = (datasetId: string) => {
   return useQuery({
-    queryKey: ['outputs', datasetId],
-    queryFn: () => apiClient.get<OutputDataset[]>(`/api/v1/datasets/${datasetId}/outputs`),
+    queryKey: ['completions', datasetId],
+    queryFn: () => apiClient.get<CompletionDataset[]>(`/api/v1/datasets/${datasetId}/completions`),
     enabled: !!datasetId,
   });
 };
@@ -62,9 +62,9 @@ export const useDeleteComparison = () => {
   });
 };
 
-export const useAllOutputDatasets = (datasetIds: string[]) => {
+export const useAllCompletionDatasets = (datasetIds: string[]) => {
   return useQuery({
-    queryKey: ['all-outputs', ...datasetIds.sort()], // Spread and sort for stable key
+    queryKey: ['all-completions', ...datasetIds.sort()], // Spread and sort for stable key
     queryFn: async () => {
       if (!datasetIds.length) {
         return [];
@@ -73,7 +73,7 @@ export const useAllOutputDatasets = (datasetIds: string[]) => {
       try {
         const results = await Promise.all(
           datasetIds.map(async (datasetId) => {
-            const result = await apiClient.get<OutputDataset[]>(`/api/v1/datasets/${datasetId}/outputs`);
+            const result = await apiClient.get<CompletionDataset[]>(`/api/v1/datasets/${datasetId}/completions`);
             return result;
           })
         );
@@ -81,7 +81,7 @@ export const useAllOutputDatasets = (datasetIds: string[]) => {
         const flattened = results.flat();
         return flattened;
       } catch (error) {
-        console.error('Error fetching output datasets:', error);
+        console.error('Error fetching completion datasets:', error);
         throw error;
       }
     },

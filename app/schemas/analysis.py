@@ -5,12 +5,12 @@ import uuid
 
 
 class AnalysisJobCreate(BaseModel):
-    output_dataset_id: uuid.UUID
+    completion_dataset_id: uuid.UUID
 
 
 class AnalysisJobResponse(BaseModel):
     id: uuid.UUID
-    output_dataset_id: uuid.UUID
+    completion_dataset_id: uuid.UUID
     status: str
     results: Dict[str, Any]
     created_at: datetime

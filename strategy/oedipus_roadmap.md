@@ -3,7 +3,7 @@
 
 ## Strategic Positioning
 **What Oedipus IS**: 
-- Observability layer for AI model/agent outputs (like DataDog for infrastructure)
+- Observability layer for AI model/agent completions (like DataDog for infrastructure)
 - Analytics and visualization platform for AI system behavior
 - Standardized schema and API for AI evaluation data
 - Developer productivity tools for AI iteration cycles
@@ -13,7 +13,7 @@
 - A provider of "ground truth" judgments
 - A replacement for domain-specific evaluation logic
 
-**Core Value**: You bring the data (inputs, outputs, and optionally your own evaluations), Oedipus provides the infrastructure to collect, analyze, visualize, and monitor it at scale.
+**Core Value**: You bring the data (prompts, completions, and optionally your own evaluations), Oedipus provides the infrastructure to collect, analyze, visualize, and monitor it at scale.
 
 ## Data Philosophy: "Bring Your Own Evaluation"
 - **Oedipus provides**: Information-theoretic metrics (entropy, token counts, consistency)

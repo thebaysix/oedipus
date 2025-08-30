@@ -82,12 +82,12 @@ else:
     st.sidebar.info("Make sure the backend is running:\n`uvicorn app.api.main:app --reload`")
 
 # Helper to submit analysis via API (synchronous for immediate results)
-# Expects `data` to be an output_dataset_id (UUID string)
+# Expects `data` to be an completion_dataset_id (UUID string)
 def submit_analysis(data):
     try:
         resp = requests.post(
             "http://localhost:8000/api/v1/analysis/run-sync",
-            json={"output_dataset_id": data},
+            json={"completion_dataset_id": data},
             timeout=300,
         )
         resp.raise_for_status()
@@ -104,7 +104,7 @@ if page == "🏠 Home":
     
     st.markdown("""
     **Oedipus** is an observability and analytics platform for AI systems. This MVP focuses on 
-    bulk upload analysis of AI model outputs, providing comprehensive information-theoretic 
+    bulk upload analysis of AI model completions, providing comprehensive information-theoretic 
     analysis to understand model behavior patterns.
     """)
     
@@ -116,7 +116,7 @@ if page == "🏠 Home":
     with col1:
         st.markdown("""
         <div class="workflow-step">
-            <h4>1. 📊 Upload Input Dataset</h4>
+            <h4>1. 📊 Upload Prompt Dataset</h4>
             <p>Upload your input prompts as JSON mapping input IDs to prompt strings.</p>
         </div>
         """, unsafe_allow_html=True)
@@ -124,8 +124,8 @@ if page == "🏠 Home":
     with col2:
         st.markdown("""
         <div class="workflow-step">
-            <h4>2. 🎯 Upload Output Dataset</h4>
-            <p>Upload corresponding model outputs as JSON mapping input IDs to output arrays.</p>
+            <h4>2. 🎯 Upload Completion Dataset</h4>
+            <p>Upload corresponding model completions as JSON mapping input IDs to output arrays.</p>
         </div>
         """, unsafe_allow_html=True)
     
@@ -176,7 +176,7 @@ if page == "🏠 Home":
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("**Input Dataset Format:**")
+        st.markdown("**Prompt Dataset Format:**")
         st.code('''
 {
     "input_1": "What is the capital of France?",
@@ -186,7 +186,7 @@ if page == "🏠 Home":
         ''', language="json")
     
     with col2:
-        st.markdown("**Output Dataset Format:**")
+        st.markdown("**Completion Dataset Format:**")
         st.code('''
 {
     "input_1": [
@@ -212,7 +212,7 @@ elif page == "📊 Upload Data":
         st.session_state.current_output_id = None
     
     # Step 1: Upload or select dataset
-    st.markdown("## Step 1: Input Dataset")
+    st.markdown("## Step 1: Prompt Dataset")
     
     tab1, tab2 = st.tabs(["📤 Upload New Dataset", "📋 Select Existing Dataset"])
     
@@ -227,19 +227,19 @@ elif page == "📊 Upload Data":
             st.session_state.current_dataset_id = selected_id
             st.success(f"Selected dataset: {selected_id}")
     
-    # Step 2: Upload outputs (only if dataset is selected)
+    # Step 2: Upload completions (only if dataset is selected)
     if st.session_state.current_dataset_id:
-        st.markdown("## Step 2: Output Dataset")
+        st.markdown("## Step 2: Completion Dataset")
         output_id = render_output_upload(st.session_state.current_dataset_id)
         if output_id:
             st.session_state.current_output_id = output_id
             st.success("✅ Ready for analysis! Go to the Analysis page.")
     else:
-        st.info("👆 Please upload or select an input dataset first.")
+        st.info("👆 Please upload or select an prompt dataset first.")
 
 elif page == "🔬 Analysis":
     if 'current_output_id' not in st.session_state or not st.session_state.current_output_id:
-        st.warning("⚠️ No output dataset selected. Please upload data first.")
+        st.warning("⚠️ No completion dataset selected. Please upload data first.")
         st.info("Go to the 'Upload Data' page to upload your datasets.")
     else:
         # Run analysis either locally or via Celery
@@ -273,7 +273,7 @@ elif page == "📈 Dashboard":
                         for ds in datasets[-3:]:  # Show last 3 datasets
                             with st.expander(f"📊 {ds['name']} ({ds['id'][:8]}...)"):
                                 st.write(f"**Created:** {ds['created_at']}")
-                                st.write(f"**Inputs:** {len(ds['inputs'])}")
+                                st.write(f"**Inputs:** {len(ds['prompts'])}")
                                 st.json(ds['metadata'])
             except:
                 pass

@@ -9,7 +9,7 @@ API_BASE_URL = "http://localhost:8000"
 
 def render_dataset_upload() -> Optional[str]:
     """Render the dataset upload component."""
-    st.header("📊 Upload Input Dataset")
+    st.header("📊 Upload Prompt Dataset")
     
     # Option to use sample data
     if st.button("Use Sample Data", key="sample_input"):
@@ -55,7 +55,7 @@ def render_dataset_upload() -> Optional[str]:
                 f"{API_BASE_URL}/api/v1/datasets/",
                 json={
                     "name": dataset_name,
-                    "inputs": data,
+                    "prompts": data,
                     "metadata": {"uploaded_via": "streamlit"}
                 }
             )
@@ -80,18 +80,18 @@ def render_dataset_upload() -> Optional[str]:
 
 
 def render_output_upload(dataset_id: str) -> Optional[str]:
-    """Render the output dataset upload component."""
-    st.header("🎯 Upload Output Dataset")
+    """Render the completion dataset upload component."""
+    st.header("🎯 Upload Completion Dataset")
     
     # Get dataset info
     try:
         response = requests.get(f"{API_BASE_URL}/api/v1/datasets/{dataset_id}")
         if response.status_code == 200:
             dataset_info = response.json()
-            st.info(f"Uploading outputs for dataset: **{dataset_info['name']}**")
+            st.info(f"Uploading completions for dataset: **{dataset_info['name']}**")
             
             # Show input keys for reference
-            input_keys = list(dataset_info['inputs'].keys())
+            input_keys = list(dataset_info['prompts'].keys())
             st.write(f"Available input IDs: {', '.join(input_keys[:10])}" + 
                     (f" ... and {len(input_keys)-10} more" if len(input_keys) > 10 else ""))
             
@@ -108,14 +108,14 @@ def render_output_upload(dataset_id: str) -> Optional[str]:
         _, sample_outputs = create_sample_data()
         st.session_state.sample_output_json = json.dumps(sample_outputs, indent=2)
     
-    # Output dataset name
+    # Completion dataset name
     output_name = st.text_input(
-        "Output Dataset Name",
-        placeholder="Enter a name for your output dataset",
+        "Completion Dataset Name",
+        placeholder="Enter a name for your completion dataset",
         key="output_name"
     )
     
-    # JSON input for outputs
+    # JSON input for completions
     output_json = st.text_area(
         "Output Data (JSON)",
         placeholder='{"input_1": ["Response 1", "Response 2"], "input_2": ["Another response"]}',
@@ -127,7 +127,7 @@ def render_output_upload(dataset_id: str) -> Optional[str]:
     # Upload button
     if st.button("Upload Outputs", key="upload_outputs"):
         if not output_name.strip():
-            st.error("Please enter an output dataset name")
+            st.error("Please enter an completion dataset name")
             return None
         
         if not output_json.strip():
@@ -144,21 +144,21 @@ def render_output_upload(dataset_id: str) -> Optional[str]:
         # Upload to API
         try:
             response = requests.post(
-                f"{API_BASE_URL}/api/v1/datasets/{dataset_id}/outputs",
+                f"{API_BASE_URL}/api/v1/datasets/{dataset_id}/completions",
                 json={
                     "name": output_name,
-                    "outputs": data,
+                    "completions": data,
                     "metadata": {"uploaded_via": "streamlit"}
                 }
             )
             
             if response.status_code == 201:
                 output_info = response.json()
-                st.success(f"Output dataset '{output_name}' uploaded successfully!")
+                st.success(f"Completion dataset '{output_name}' uploaded successfully!")
                 
-                total_outputs = sum(len(outputs) for outputs in data.values())
+                total_outputs = sum(len(completions) for completions in data.values())
                 st.json({
-                    "output_dataset_id": output_info["id"],
+                    "completion_dataset_id": output_info["id"],
                     "total_outputs": total_outputs,
                     "inputs_covered": len(data)
                 })

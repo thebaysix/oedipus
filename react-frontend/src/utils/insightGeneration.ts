@@ -82,7 +82,7 @@ export class InsightGenerator {
       insights.push({
         type: 'coverage',
         title: 'Low Data Alignment Coverage',
-        description: `Only ${coveragePercentage.toFixed(1)}% of inputs have matching outputs (${matchedInputs}/${totalInputs}). This reduces the reliability of comparative analysis.`,
+        description: `Only ${coveragePercentage.toFixed(1)}% of prompts have matching completions (${matchedInputs}/${totalInputs}). This reduces the reliability of comparative analysis.`,
         impact: coveragePercentage < 50 ? 'high' : 'medium',
         confidence: 0.9,
         metrics: ['alignment_coverage'],
@@ -116,7 +116,7 @@ export class InsightGenerator {
         insights.push({
           type: 'quality',
           title: 'Significant Output Diversity Differences',
-          description: `Average entropy difference of ${avgEntropyDiff.toFixed(2)} suggests models produce outputs with different levels of diversity and creativity.`,
+          description: `Average entropy difference of ${avgEntropyDiff.toFixed(2)} suggests models produce completions with different levels of diversity and creativity.`,
           impact: 'medium',
           confidence: 0.7,
           metrics: entropyMetrics.map(m => m.name)
@@ -152,14 +152,14 @@ export class InsightGenerator {
     
     if (!this.alignment?.alignedRows) return insights;
 
-    // Analyze output consistency across inputs
+    // Analyze output consistency across prompts
     const consistencyAnalysis = this.analyzeOutputConsistency();
     
     if (consistencyAnalysis.highVariabilityInputs > 0) {
       insights.push({
         type: 'consistency',
         title: 'Inconsistent Performance on Some Inputs',
-        description: `${consistencyAnalysis.highVariabilityInputs} inputs show high variability in output quality between models. These may be challenging edge cases.`,
+        description: `${consistencyAnalysis.highVariabilityInputs} prompts show high variability in output quality between models. These may be challenging edge cases.`,
         impact: 'medium',
         confidence: 0.6,
         metrics: ['output_consistency'],
@@ -181,7 +181,7 @@ export class InsightGenerator {
       insights.push({
         type: 'outlier',
         title: 'Outlier Inputs Detected',
-        description: `${outliers.length} inputs show unusual patterns that may warrant individual investigation. These represent potential edge cases or data quality issues.`,
+        description: `${outliers.length} prompts show unusual patterns that may warrant individual investigation. These represent potential edge cases or data quality issues.`,
         impact: 'low',
         confidence: 0.5,
         metrics: ['outlier_detection'],
@@ -269,11 +269,11 @@ export class InsightGenerator {
     let totalConsistency = 0;
 
     for (const row of this.alignment.alignedRows) {
-      const outputs = Object.values(row.outputs).filter(o => o !== null) as string[][];
-      if (outputs.length < 2) continue;
+      const completions = Object.values(row.completions).filter(o => o !== null) as string[][];
+      if (completions.length < 2) continue;
 
       // Simple consistency measure based on output length variation
-      const lengths = outputs.map(outputArray => outputArray.reduce((sum, text) => sum + text.length, 0));
+      const lengths = completions.map(outputArray => outputArray.reduce((sum, text) => sum + text.length, 0));
       const avgLength = lengths.reduce((sum, len) => sum + len, 0) / lengths.length;
       const variance = lengths.reduce((sum, len) => sum + Math.pow(len - avgLength, 2), 0) / lengths.length;
       const cv = avgLength > 0 ? Math.sqrt(variance) / avgLength : 0; // coefficient of variation
@@ -295,8 +295,8 @@ export class InsightGenerator {
     
     // Simple outlier detection based on output length
     const allLengths = this.alignment.alignedRows.map(row => {
-      const outputs = Object.values(row.outputs).filter(o => o !== null) as string[][];
-      return outputs.reduce((sum, outputArray) => sum + outputArray.reduce((s, text) => s + text.length, 0), 0);
+      const completions = Object.values(row.completions).filter(o => o !== null) as string[][];
+      return completions.reduce((sum, outputArray) => sum + outputArray.reduce((s, text) => s + text.length, 0), 0);
     });
 
     if (allLengths.length === 0) return [];

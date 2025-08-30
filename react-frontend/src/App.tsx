@@ -26,7 +26,7 @@ import { ReportGenerator } from './components/Export/ReportGenerator';
 import { useUpload } from './hooks/useUpload';
 import { 
   useDatasets, 
-  useAllOutputDatasets,
+  useAllCompletionDatasets,
   useCreateComparison, 
   useComparison 
 } from './hooks/useComparison';
@@ -53,9 +53,9 @@ function App() {
   
   const queryClient = useQueryClient();
   const { data: datasets = [], error: datasetsError } = useDatasets();
-  const { data: allOutputDatasets = [], error: outputDatasetsError, isLoading: isLoadingOutputs, refetch: refetchOutputs } = useAllOutputDatasets(datasets.map(d => d.id));
+  const { data: allCompletionDatasets = [], error: completionDatasetsError, isLoading: isLoadingOutputs, refetch: refetchOutputs } = useAllCompletionDatasets(datasets.map(d => d.id));
   
-  // Auto-refetch outputs when datasets are first loaded (for initial page load)
+  // Auto-refetch completions when datasets are first loaded (for initial page load)
   useEffect(() => {
     if (datasets.length > 0) {
       refetchOutputs();
@@ -96,7 +96,7 @@ function App() {
   }
 
   // Extract uploaded datasets for comparison creation
-  const uploadedInputDatasets = datasets.slice(-5); // Show recent datasets
+  const uploadedPromptDatasets = datasets.slice(-5); // Show recent datasets
   const completedFiles = files.filter(f => f.status === 'completed');
   
   // Extract alignment data from comparison
@@ -104,9 +104,9 @@ function App() {
   const metrics: StatisticalMetric[] = comparison?.statistical_results?.metrics || [];
 
   const handleCreateComparison = async () => {
-    // Check if we have at least 1 input dataset and 2 output datasets
-    if (datasets.length === 0 || allOutputDatasets.length < 2) {
-      alert('Please upload at least one input dataset and two output datasets');
+    // Check if we have at least 1 prompt dataset and 2 completion datasets
+    if (datasets.length === 0 || allCompletionDatasets.length < 2) {
+      alert('Please upload at least one prompt dataset and two completion datasets');
       return;
     }
 
@@ -114,7 +114,7 @@ function App() {
       const result = await createComparisonMutation.mutateAsync({
         name: `Comparison ${new Date().toLocaleString()}`,
         dataset_id: datasets[0].id,
-        output_dataset_ids: allOutputDatasets.slice(0, 2).map(d => d.id), // Compare first two outputs
+        completion_dataset_ids: allCompletionDatasets.slice(0, 2).map(d => d.id), // Compare first two completions
         alignment_key: 'input_id'
       });
       
@@ -215,7 +215,7 @@ function App() {
                 onRemove={removeFile}
                 onTypeChange={updateFileType}
                 onUpload={uploadFile}
-                inputDatasets={uploadedInputDatasets}
+                promptDatasets={uploadedPromptDatasets}
                 disabled={isUploading}
               />
             ))}
@@ -241,7 +241,7 @@ function App() {
       <div className="text-center">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Create Comparison</h2>
         <p className="text-gray-600">
-          Set up your comparative analysis between different model outputs
+          Set up your comparative analysis between different model completions
         </p>
       </div>
 
@@ -252,27 +252,27 @@ function App() {
               Available Prompt & Completion Datasets
             </label>
             <div className="space-y-2">
-              {/* Input Datasets */}
+              {/* Prompt Datasets */}
               {datasets.slice(-5).map(dataset => (
                 <div key={dataset.id} className="flex items-center gap-3 p-3 border rounded">
                   <Database className="w-5 h-5 text-blue-500" />
                   <div>
                     <div className="font-medium">{dataset.name} <span className="text-xs bg-blue-100 text-blue-800 px-1 rounded">PROMPTS</span></div>
                     <div className="text-sm text-gray-500">
-                      {Object.keys(dataset.inputs).length} prompts • Created {new Date(dataset.created_at).toLocaleDateString()}
+                      {Object.keys(dataset.prompts).length} prompts • Created {new Date(dataset.created_at).toLocaleDateString()}
                     </div>
                   </div>
                 </div>
               ))}
               
-              {/* Output Datasets */}
-              {allOutputDatasets.map(outputDataset => (
-                <div key={outputDataset.id} className="flex items-center gap-3 p-3 border rounded">
+              {/* Completion Datasets */}
+              {allCompletionDatasets.map(completionDataset => (
+                <div key={completionDataset.id} className="flex items-center gap-3 p-3 border rounded">
                   <Database className="w-5 h-5 text-green-500" />
                   <div>
-                    <div className="font-medium">{outputDataset.name} <span className="text-xs bg-green-100 text-green-800 px-1 rounded">COMPLETIONS</span></div>
+                    <div className="font-medium">{completionDataset.name} <span className="text-xs bg-green-100 text-green-800 px-1 rounded">COMPLETIONS</span></div>
                     <div className="text-sm text-gray-500">
-                      {outputDataset.metadata?.total_outputs || 0} completions • Created {new Date(outputDataset.created_at).toLocaleDateString()}
+                      {completionDataset.metadata?.total_outputs || 0} completions • Created {new Date(completionDataset.created_at).toLocaleDateString()}
                     </div>
                   </div>
                 </div>
@@ -285,7 +285,7 @@ function App() {
           <div className="pt-4">
             <button
               onClick={handleCreateComparison}
-              disabled={createComparisonMutation.isPending || datasets.length === 0 || isLoadingOutputs || allOutputDatasets.length < 2}
+              disabled={createComparisonMutation.isPending || datasets.length === 0 || isLoadingOutputs || allCompletionDatasets.length < 2}
               className={clsx(
                 'w-full px-4 py-2 rounded-lg font-medium transition-colors',
                 'bg-primary-500 text-white hover:bg-primary-600',
@@ -308,12 +308,12 @@ function App() {
                 <span className="text-orange-600">⚠ Need at least 1 prompt dataset</span>
               ) : isLoadingOutputs ? (
                 <span className="text-blue-600">🔄 Loading completions...</span>
-              ) : outputDatasetsError ? (
+              ) : completionDatasetsError ? (
                 <span className="text-red-600">❌ Error loading completions</span>
-              ) : allOutputDatasets.length < 2 ? (
-                <span className="text-orange-600">⚠ Need at least 2 completion datasets (currently {allOutputDatasets.length})</span>
+              ) : allCompletionDatasets.length < 2 ? (
+                <span className="text-orange-600">⚠ Need at least 2 completion datasets (currently {allCompletionDatasets.length})</span>
               ) : (
-                <span className="text-green-600">✓ Ready to compare {allOutputDatasets.length} completion datasets</span>
+                <span className="text-green-600">✓ Ready to compare {allCompletionDatasets.length} completion datasets</span>
               )}
             </div>
           </div>
@@ -354,7 +354,7 @@ function App() {
 
     const alignmentData = alignment?.alignedRows || [];
     const datasetNames = alignmentData.length > 0 
-      ? Object.keys(alignmentData[0].outputs) 
+      ? Object.keys(alignmentData[0].completions) 
       : [];
 
     return (
@@ -362,7 +362,7 @@ function App() {
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Comparison Results</h2>
           <p className="text-gray-600">
-            Detailed analysis of your model outputs with statistical insights
+            Detailed analysis of your model completions with statistical insights
           </p>
         </div>
 

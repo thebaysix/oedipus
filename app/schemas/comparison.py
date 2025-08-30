@@ -5,11 +5,11 @@ import uuid
 
 
 # Keep this request model compatible with the existing frontend.
-# It accepts a base dataset_id and a list of output_dataset_ids to compare.
+# It accepts a base dataset_id and a list of completion_dataset_ids to compare.
 class ComparisonCreate(BaseModel):
     name: str
     dataset_id: uuid.UUID
-    output_dataset_ids: List[uuid.UUID] = Field(..., min_items=2, description="At least two output datasets to compare")
+    completion_dataset_ids: List[uuid.UUID] = Field(..., min_items=2, description="At least two completion datasets to compare")
     alignment_key: str = "input_id"
     comparison_config: Optional[Dict[str, Any]] = {}
 

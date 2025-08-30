@@ -4,29 +4,29 @@ from datetime import datetime
 import uuid
 
 
-class OutputDatasetCreate(BaseModel):
+class CompletionDatasetCreate(BaseModel):
     name: str
-    outputs: Dict[str, List[str]]  # mapping input_id -> [output_strings]
+    completions: Dict[str, List[str]]  # mapping input_id -> [output_strings]
     metadata: Optional[Dict[str, Any]] = {}
 
 
-class OutputDatasetResponse(BaseModel):
+class CompletionDatasetResponse(BaseModel):
     id: uuid.UUID
     name: str
     dataset_id: uuid.UUID
     created_at: datetime
-    outputs: Dict[str, List[str]]
+    completions: Dict[str, List[str]]
     metadata: Dict[str, Any]
 
     @classmethod
-    def from_orm_with_alias(cls, obj: "OutputDataset"):
+    def from_orm_with_alias(cls, obj: "CompletionDataset"):
         # Map ORM user_metadata -> API metadata
         return cls(
             id=obj.id,
             name=obj.name,
             dataset_id=obj.dataset_id,
             created_at=obj.created_at,
-            outputs=obj.outputs,
+            completions=obj.completions,
             metadata=getattr(obj, 'user_metadata', {}) or {}
         )
     

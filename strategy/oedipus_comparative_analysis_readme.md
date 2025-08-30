@@ -3,13 +3,13 @@
 
 ## Overview
 
-The Comparative Analysis feature transforms Oedipus from an analytics tool into an essential workflow component for AI model evaluation. Instead of analyzing datasets in isolation, this feature enables developers to directly compare model outputs, detect performance regressions, and make data-driven decisions about model selection and prompt engineering.
+The Comparative Analysis feature transforms Oedipus from an analytics tool into an essential workflow component for AI model evaluation. Instead of analyzing datasets in isolation, this feature enables developers to directly compare model completions, detect performance regressions, and make data-driven decisions about model selection and prompt engineering.
 
 This standalone React application addresses the most critical gap in the current MVP: the lack of actionable comparative insights that developers need to make deployment decisions.
 
 ## Problem Statement
 
-**Current State**: Developers manually compare model outputs by writing custom scripts, eyeballing CSV files, or building one-off analysis notebooks. This process is time-consuming, error-prone, and doesn't provide statistical rigor.
+**Current State**: Developers manually compare model completions by writing custom scripts, eyeballing CSV files, or building one-off analysis notebooks. This process is time-consuming, error-prone, and doesn't provide statistical rigor.
 
 **Target State**: Developers upload multiple datasets, receive automated statistical comparisons with confidence intervals, and get actionable insights about which models perform better and why.
 
@@ -24,7 +24,7 @@ This standalone React application addresses the most critical gap in the current
 **"Model Performance Detective"** - Answer specific questions developers ask daily:
 - "Which model should I deploy?"
 - "Did my latest prompt engineering actually improve results?"
-- "What inputs consistently cause problems across models?"
+- "What prompts consistently cause problems across models?"
 - "Is the performance difference statistically significant?"
 
 ## Technical Architecture
@@ -162,7 +162,7 @@ interface AlignmentResult {
 interface AlignedRow {
   inputId: string;
   inputText: string;
-  outputs: {
+  completions: {
     [datasetName: string]: string[] | null;
   };
   metadata: {
@@ -172,7 +172,7 @@ interface AlignedRow {
 ```
 
 **Validation Rules**:
-- Minimum 10 aligned inputs for statistical significance
+- Minimum 10 aligned prompts for statistical significance
 - Maximum 50,000 rows per dataset (performance constraint)
 - Required fields: input identifier and output content
 - Optional fields: model version, timestamp, custom scores
@@ -240,7 +240,7 @@ interface GeneratedInsight {
 
 **Insight Categories**:
 - **Performance Differences**: "Model B generates 34% more diverse responses (p<0.001)"
-- **Quality Regressions**: "3 inputs consistently produce lower quality outputs in Model A"
+- **Quality Regressions**: "3 prompts consistently produce lower quality completions in Model A"
 - **Consistency Issues**: "Model C shows 2x higher variance in response length"
 - **Edge Case Detection**: "Inputs >200 tokens show degraded performance across all models"
 

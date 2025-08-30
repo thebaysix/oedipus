@@ -3,7 +3,7 @@ from typing import Dict, Any
 import uuid
 from datetime import datetime
 from ..models.analysis import AnalysisJob
-from ..models.output import OutputDataset
+from ..models.completion import CompletionDataset
 from ..schemas.analysis import AnalysisJobCreate
 from .metrics.entropy import calculate_input_entropy, calculate_response_entropy
 from .metrics.information_gain import calculate_mutual_information
@@ -17,16 +17,16 @@ class AnalysisService:
     
     def create_analysis_job(self, job_data: AnalysisJobCreate) -> AnalysisJob:
         """Create a new analysis job."""
-        # Verify the output dataset exists
-        output_dataset = self.db.query(OutputDataset).filter(
-            OutputDataset.id == job_data.output_dataset_id
+        # Verify the completion dataset exists
+        completion_dataset = self.db.query(CompletionDataset).filter(
+            CompletionDataset.id == job_data.completion_dataset_id
         ).first()
         
-        if not output_dataset:
-            raise ValueError(f"Output dataset {job_data.output_dataset_id} not found")
+        if not completion_dataset:
+            raise ValueError(f"Completion dataset {job_data.completion_dataset_id} not found")
         
         db_job = AnalysisJob(
-            output_dataset_id=job_data.output_dataset_id,
+            completion_dataset_id=job_data.completion_dataset_id,
             status="pending"
         )
         self.db.add(db_job)
@@ -59,14 +59,14 @@ class AnalysisService:
         self.update_job_status(job_id, "running")
         
         try:
-            # Get the output dataset and related input dataset
-            output_dataset = job.output_dataset
-            input_dataset = output_dataset.dataset
+            # Get the completion dataset and related prompt dataset
+            completion_dataset = job.completion_dataset
+            prompt_dataset = completion_dataset.dataset
             
             # Run all analyses
             results = self.compute_all_metrics(
-                input_dataset.inputs,
-                output_dataset.outputs
+                prompt_dataset.prompts,
+                completion_dataset.completions
             )
             
             # Update job with results
@@ -79,33 +79,33 @@ class AnalysisService:
             self.update_job_status(job_id, "failed", error_results)
             raise
     
-    def compute_all_metrics(self, inputs: Dict[str, str], outputs: Dict[str, list]) -> Dict[str, Any]:
-        """Compute all available metrics for the given inputs and outputs."""
+    def compute_all_metrics(self, prompts: Dict[str, str], completions: Dict[str, list]) -> Dict[str, Any]:
+        """Compute all available metrics for the given prompts and completions."""
         results = {}
         
         # Information-theoretic metrics
-        results["information_theory"] = calculate_mutual_information(inputs, outputs)
+        results["information_theory"] = calculate_mutual_information(prompts, completions)
         
         # Output diversity metrics
-        results["diversity"] = calculate_output_diversity_metrics(inputs, outputs)
+        results["diversity"] = calculate_output_diversity_metrics(prompts, completions)
         
         # Basic metrics
-        results["character_metrics"] = calculate_character_metrics(outputs)
-        results["token_metrics"] = calculate_token_metrics(outputs)
+        results["character_metrics"] = calculate_character_metrics(completions)
+        results["token_metrics"] = calculate_token_metrics(completions)
         
         # Summary statistics
-        results["summary"] = self._compute_summary_stats(inputs, outputs)
+        results["summary"] = self._compute_summary_stats(prompts, completions)
         
         return results
     
-    def _compute_summary_stats(self, inputs: Dict[str, str], outputs: Dict[str, list]) -> Dict[str, Any]:
+    def _compute_summary_stats(self, prompts: Dict[str, str], completions: Dict[str, list]) -> Dict[str, Any]:
         """Compute summary statistics."""
-        total_inputs = len(inputs)
-        total_outputs = sum(len(output_list) for output_list in outputs.values())
-        unique_inputs = len(set(inputs.values()))
+        total_inputs = len(prompts)
+        total_outputs = sum(len(output_list) for output_list in completions.values())
+        unique_inputs = len(set(prompts.values()))
         
         all_outputs = []
-        for output_list in outputs.values():
+        for output_list in completions.values():
             all_outputs.extend(output_list)
         unique_outputs = len(set(all_outputs))
         
@@ -115,5 +115,5 @@ class AnalysisService:
             "unique_inputs": unique_inputs,
             "unique_outputs": unique_outputs,
             "avg_outputs_per_input": total_outputs / total_inputs if total_inputs > 0 else 0,
-            "input_coverage": len(outputs) / total_inputs if total_inputs > 0 else 0
+            "input_coverage": len(completions) / total_inputs if total_inputs > 0 else 0
         }

@@ -3,18 +3,18 @@ export interface Dataset {
   name: string;
   user_id: string;
   created_at: string;
-  inputs: Record<string, string>; // mapping input_id -> input_text
+  prompts: Record<string, string>; // mapping input_id -> input_text
   metadata: Record<string, any>;
   description?: string;
   input_count?: number; // computed field
 }
 
-export interface OutputDataset {
+export interface CompletionDataset {
   id: string;
   name: string;
   dataset_id: string;
   created_at: string;
-  outputs: Record<string, string[]>; // mapping input_id -> output_texts
+  completions: Record<string, string[]>; // mapping input_id -> output_texts
   metadata: Record<string, any>;
   output_count?: number; // computed field
 }
@@ -22,7 +22,7 @@ export interface OutputDataset {
 export interface ComparisonCreate {
   name: string;
   dataset_id: string;
-  output_dataset_ids: string[];
+  completion_dataset_ids: string[];
   alignment_key?: string;
   comparison_config?: Record<string, any>;
 }
@@ -52,7 +52,7 @@ export interface AlignmentResult {
 export interface AlignedRow {
   inputId: string;
   inputText: string;
-  outputs: Record<string, string[] | null>;
+  completions: Record<string, string[] | null>;
   metadata: Record<string, Record<string, any>>;
 }
 

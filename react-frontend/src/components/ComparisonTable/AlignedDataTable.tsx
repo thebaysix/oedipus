@@ -32,16 +32,16 @@ export const AlignedDataTable: React.FC<AlignedDataTableProps> = ({
       
       // Add computed metrics for each dataset
       for (const dsName of datasetNames) {
-        const outputs = row.outputs[dsName] || [];
-        if (Array.isArray(outputs)) {
-          const lengths = outputs.map(o => o?.length || 0);
+        const completions = row.completions[dsName] || [];
+        if (Array.isArray(completions)) {
+          const lengths = completions.map(o => o?.length || 0);
           const avgLength = lengths.reduce((a, b) => a + b, 0) / lengths.length || 0;
           
           processed.metadata = {
             ...processed.metadata,
             [dsName]: {
               ...processed.metadata[dsName],
-              outputCount: outputs.length,
+              outputCount: completions.length,
               avgLength: Math.round(avgLength),
               totalLength: lengths.reduce((a, b) => a + b, 0)
             }
@@ -63,8 +63,8 @@ export const AlignedDataTable: React.FC<AlignedDataTableProps> = ({
         row.inputId.toLowerCase().includes(query) ||
         row.inputText.toLowerCase().includes(query) ||
         datasetNames.some(dsName => {
-          const outputs = row.outputs[dsName];
-          return Array.isArray(outputs) && outputs.some(output => 
+          const completions = row.completions[dsName];
+          return Array.isArray(completions) && completions.some(output => 
             output?.toLowerCase().includes(query)
           );
         })
@@ -74,8 +74,8 @@ export const AlignedDataTable: React.FC<AlignedDataTableProps> = ({
     // Apply difference filter
     if (showOnlyDifferences && datasetNames.length >= 2) {
       filtered = filtered.filter(row => {
-        const outputs = datasetNames.map(dsName => row.outputs[dsName]);
-        const lengths = outputs.map(output => 
+        const completions = datasetNames.map(dsName => row.completions[dsName]);
+        const lengths = completions.map(output => 
           Array.isArray(output) ? output.reduce((sum, o) => sum + (o?.length || 0), 0) : 0
         );
         const minLength = Math.min(...lengths);
@@ -247,12 +247,12 @@ export const AlignedDataTable: React.FC<AlignedDataTableProps> = ({
                   <td key={dsName} className="px-4 py-3">
                     {viewMode === 'text' ? (
                       <div className="max-w-xs">
-                        {Array.isArray(row.outputs[dsName]) && row.outputs[dsName]!.length > 0 ? (
+                        {Array.isArray(row.completions[dsName]) && row.completions[dsName]!.length > 0 ? (
                           <div className="truncate">
-                            {row.outputs[dsName]![0]}
-                            {row.outputs[dsName]!.length > 1 && (
+                            {row.completions[dsName]![0]}
+                            {row.completions[dsName]!.length > 1 && (
                               <span className="text-gray-400 text-xs ml-2">
-                                +{row.outputs[dsName]!.length - 1} more
+                                +{row.completions[dsName]!.length - 1} more
                               </span>
                             )}
                           </div>

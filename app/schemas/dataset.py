@@ -6,7 +6,7 @@ import uuid
 
 class DatasetCreate(BaseModel):
     name: str
-    inputs: Dict[str, str]  # mapping inputId -> input_string
+    prompts: Dict[str, str]  # mapping inputId -> input_string
     metadata: Optional[Dict[str, Any]] = {}
 
 
@@ -15,7 +15,7 @@ class DatasetResponse(BaseModel):
     name: str
     user_id: uuid.UUID
     created_at: datetime
-    inputs: Dict[str, str]
+    prompts: Dict[str, str]
     metadata: Dict[str, Any]
 
     @classmethod
@@ -26,7 +26,7 @@ class DatasetResponse(BaseModel):
             name=obj.name,
             user_id=obj.user_id,
             created_at=obj.created_at,
-            inputs=obj.inputs,
+            prompts=obj.prompts,
             metadata=getattr(obj, 'user_metadata', {}) or {}
         )
     

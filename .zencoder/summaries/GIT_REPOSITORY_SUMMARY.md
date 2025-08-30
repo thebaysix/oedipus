@@ -67,7 +67,7 @@ oedipus/
 Initial commit: Oedipus MVP Phase 1 complete implementation
 
 - Complete FastAPI backend with REST API endpoints
-- SQLAlchemy models for datasets, outputs, and analysis jobs
+- SQLAlchemy models for datasets, completions, and analysis jobs
 - Information-theoretic analysis engine with entropy, information gain, and empowerment metrics
 - Celery background workers for async analysis processing
 - Streamlit frontend with interactive UI and visualizations
@@ -79,7 +79,7 @@ Initial commit: Oedipus MVP Phase 1 complete implementation
 
 Features implemented:
 ✅ Dataset upload and management
-✅ Output dataset validation and storage
+✅ Completion dataset validation and storage
 ✅ Real-time analysis with progress tracking
 ✅ Interactive visualizations with Plotly
 ✅ Export capabilities (JSON/CSV)

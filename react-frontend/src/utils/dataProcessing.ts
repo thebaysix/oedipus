@@ -40,7 +40,7 @@ export const parseCSVFile = (file: File): Promise<ParseResult> => {
   });
 };
 
-export const validateInputDataset = (headers: string[]): string[] => {
+export const validatePromptDataset = (headers: string[]): string[] => {
   const errors: string[] = [];
   
   if (!headers.includes('input_id')) {
@@ -54,7 +54,7 @@ export const validateInputDataset = (headers: string[]): string[] => {
   return errors;
 };
 
-export const validateOutputDataset = (headers: string[]): string[] => {
+export const validateCompletionDataset = (headers: string[]): string[] => {
   const errors: string[] = [];
   
   if (!headers.includes('input_id')) {

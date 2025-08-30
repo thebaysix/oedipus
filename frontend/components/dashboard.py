@@ -14,7 +14,7 @@ from .visualizations import (
 API_BASE_URL = "http://localhost:8000"
 
 
-def render_analysis_dashboard(output_dataset_id: str):
+def render_analysis_dashboard(completion_dataset_id: str):
     """Render the main analysis dashboard."""
     st.header("🔬 Analysis Dashboard")
     
@@ -22,23 +22,23 @@ def render_analysis_dashboard(output_dataset_id: str):
     col1, col2 = st.columns([2, 1])
     
     with col1:
-        st.info(f"Output Dataset ID: {output_dataset_id}")
+        st.info(f"Completion Dataset ID: {completion_dataset_id}")
     
     with col2:
         if st.button("🚀 Run Analysis", key="run_analysis"):
-            run_analysis_job(output_dataset_id)
+            run_analysis_job(completion_dataset_id)
     
     # Check for existing analysis results
-    check_analysis_status(output_dataset_id)
+    check_analysis_status(completion_dataset_id)
 
 
-def run_analysis_job(output_dataset_id: str):
+def run_analysis_job(completion_dataset_id: str):
     """Start an analysis job."""
     try:
         # Start analysis job
         response = requests.post(
             f"{API_BASE_URL}/api/v1/analysis/run",
-            json={"output_dataset_id": output_dataset_id}
+            json={"completion_dataset_id": completion_dataset_id}
         )
         
         if response.status_code == 201:
@@ -169,14 +169,14 @@ def display_analysis_results(results: Dict[str, Any]):
             st.metric(
                 "Response Entropy",
                 f"{info_theory.get('response_entropy', 0):.4f}",
-                help="Measures the diversity of outputs given inputs"
+                help="Measures the diversity of completions given prompts"
             )
         
         with col2:
             st.metric(
                 "Information Gain",
                 f"{info_theory.get('information_gain', 0):.4f}",
-                help="How much information outputs provide about inputs"
+                help="How much information completions provide about prompts"
             )
             st.metric(
                 "Normalized Info Gain",
@@ -222,19 +222,19 @@ def display_analysis_results(results: Dict[str, Any]):
             st.metric(
                 "Unique Output Ratio",
                 f"{diversity.get('unique_outputs_ratio', 0):.2%}",
-                help="Percentage of outputs that are unique"
+                help="Percentage of completions that are unique"
             )
         
         with col2:
             st.metric(
                 "Coverage Rate",
                 f"{summary.get('input_coverage', 0):.2%}",
-                help="Percentage of inputs that have outputs"
+                help="Percentage of prompts that have completions"
             )
             st.metric(
                 "Avg Outputs/Input",
                 f"{diversity.get('average_outputs_per_input', 0):.2f}",
-                help="Average number of outputs per input"
+                help="Average number of completions per input"
             )
     
     with tab5:
@@ -245,7 +245,7 @@ def display_analysis_results(results: Dict[str, Any]):
     render_export_options(results)
 
 
-def check_analysis_status(output_dataset_id: str):
+def check_analysis_status(completion_dataset_id: str):
     """Check if there are any existing analysis results."""
     if "analysis_results" in st.session_state:
         st.info("📊 Previous analysis results found!")

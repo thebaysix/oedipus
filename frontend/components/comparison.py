@@ -21,11 +21,11 @@ def _list_datasets() -> List[Dict[str, Any]]:
 
 def _list_outputs(dataset_id: str) -> List[Dict[str, Any]]:
     try:
-        r = requests.get(f"{API_BASE_URL}/api/v1/datasets/{dataset_id}/outputs")
+        r = requests.get(f"{API_BASE_URL}/api/v1/datasets/{dataset_id}/completions")
         r.raise_for_status()
         return r.json()
     except Exception as e:
-        st.error(f"Failed to fetch output datasets: {e}")
+        st.error(f"Failed to fetch completion datasets: {e}")
         return []
 
 
@@ -79,7 +79,7 @@ def _alignment_to_dataframe(alignment: Dict[str, Any]) -> Tuple[pd.DataFrame, Li
         return pd.DataFrame(columns=["inputId", "inputText"]), []
 
     # Determine dataset display names from first row
-    first_outputs = rows[0].get("outputs", {})
+    first_outputs = rows[0].get("completions", {})
     dataset_names = list(first_outputs.keys())
 
     # Build table
@@ -89,9 +89,9 @@ def _alignment_to_dataframe(alignment: Dict[str, Any]) -> Tuple[pd.DataFrame, Li
             "inputId": r.get("inputId"),
             "inputText": r.get("inputText", ""),
         }
-        outputs = r.get("outputs", {}) or {}
+        completions = r.get("completions", {}) or {}
         for ds in dataset_names:
-            values = outputs.get(ds)
+            values = completions.get(ds)
             # Show first output text for overview; keep counts and lengths for metrics
             first_text = (values[0] if isinstance(values, list) and values else None)
             entry[f"{ds}__text"] = first_text
@@ -110,21 +110,21 @@ def render_comparison_creator() -> Optional[str]:
 
     datasets = _list_datasets()
     if not datasets:
-        st.info("No datasets available. Upload inputs and outputs first.")
+        st.info("No datasets available. Upload prompts and completions first.")
         return None
 
     ds_options = {f"{d['name']} ({d['id'][:8]}...)": d for d in datasets}
-    ds_label = st.selectbox("Base Input Dataset", options=list(ds_options.keys()))
+    ds_label = st.selectbox("Base Prompt Dataset", options=list(ds_options.keys()))
     selected_dataset = ds_options[ds_label]
 
-    outputs = _list_outputs(selected_dataset['id'])
-    if not outputs:
-        st.info("This dataset has no output datasets yet.")
+    completions = _list_outputs(selected_dataset['id'])
+    if not completions:
+        st.info("This dataset has no completion datasets yet.")
         return None
 
-    out_options = {f"{o['name']} ({o['id'][:8]}...)": o for o in outputs}
+    out_options = {f"{o['name']} ({o['id'][:8]}...)": o for o in completions}
     chosen_labels = st.multiselect(
-        "Select at least two output datasets to compare",
+        "Select at least two completion datasets to compare",
         options=list(out_options.keys()),
     )
 
@@ -134,21 +134,21 @@ def render_comparison_creator() -> Optional[str]:
     with col1:
         create_clicked = st.button("Create Comparison", type="primary")
     with col2:
-        st.caption("Tip: Ensure the selected outputs belong to the chosen input dataset.")
+        st.caption("Tip: Ensure the selected completions belong to the chosen prompt dataset.")
 
     if create_clicked:
         if not comp_name.strip():
             st.error("Please enter a comparison name.")
             return None
         if len(chosen_labels) < 2:
-            st.error("Select at least two output datasets.")
+            st.error("Select at least two completion datasets.")
             return None
 
         chosen_outputs = [out_options[lbl]['id'] for lbl in chosen_labels]
         payload = {
             "name": comp_name,
             "dataset_id": selected_dataset['id'],
-            "output_dataset_ids": chosen_outputs,
+            "completion_dataset_ids": chosen_outputs,
             "alignment_key": "input_id",
             "comparison_config": {"min_aligned": 10},
         }
@@ -247,7 +247,7 @@ def render_comparison_explorer():
             reason = "Its stored results are missing the alignment section."
         else:
             reason = "Alignment payload is empty."
-        st.warning(f"No alignment data available for this comparison. {reason} Create a new comparison or re-upload outputs to populate alignment.")
+        st.warning(f"No alignment data available for this comparison. {reason} Create a new comparison or re-upload completions to populate alignment.")
         return
 
     # Summary metrics

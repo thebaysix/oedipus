@@ -34,7 +34,7 @@ async def upload_dataset(
         csv_content = content.decode('utf-8')
         
         # Parse CSV data
-        inputs = {}
+        prompts = {}
         reader = csv.DictReader(io.StringIO(csv_content))
         
         # Validate required columns
@@ -51,9 +51,9 @@ async def upload_dataset(
             if not input_id or not input_text:
                 continue  # Skip empty rows
                 
-            inputs[input_id] = input_text
+            prompts[input_id] = input_text
         
-        if not inputs:
+        if not prompts:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="No valid input data found in CSV"
@@ -62,10 +62,10 @@ async def upload_dataset(
         # Create dataset using existing service
         dataset_create = DatasetCreate(
             name=name,
-            inputs=inputs,
+            prompts=prompts,
             metadata={
                 "source_file": file.filename,
-                "total_inputs": len(inputs)
+                "total_inputs": len(prompts)
             }
         )
         

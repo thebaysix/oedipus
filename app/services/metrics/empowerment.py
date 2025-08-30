@@ -3,22 +3,22 @@ from collections import Counter, defaultdict
 from typing import List, Dict, Any
 
 
-def calculate_empowerment(inputs: Dict[str, str], outputs: Dict[str, List[str]]) -> float:
+def calculate_empowerment(prompts: Dict[str, str], completions: Dict[str, List[str]]) -> float:
     """
     Calculate empowerment metric - influence of model decisions on output diversity.
     E = I(A;X'|X) = H(A|X) - H(A|X,X')
     
     Simplified version: measures how much the model's choice of output affects
-    the diversity of possible next outputs.
+    the diversity of possible next completions.
     """
-    if not inputs or not outputs:
+    if not prompts or not completions:
         return 0.0
     
-    # Group outputs by input
+    # Group completions by input
     input_output_groups = defaultdict(list)
-    for input_id, input_text in inputs.items():
-        if input_id in outputs:
-            input_output_groups[input_text].extend(outputs[input_id])
+    for input_id, input_text in prompts.items():
+        if input_id in completions:
+            input_output_groups[input_text].extend(completions[input_id])
     
     if not input_output_groups:
         return 0.0
@@ -31,7 +31,7 @@ def calculate_empowerment(inputs: Dict[str, str], outputs: Dict[str, List[str]])
         if len(output_list) < 2:
             continue
         
-        # Calculate diversity of outputs for this input
+        # Calculate diversity of completions for this input
         output_counts = Counter(output_list)
         group_size = len(output_list)
         
@@ -50,11 +50,11 @@ def calculate_empowerment(inputs: Dict[str, str], outputs: Dict[str, List[str]])
     return total_empowerment / total_weight if total_weight > 0 else 0.0
 
 
-def calculate_output_diversity_metrics(inputs: Dict[str, str], outputs: Dict[str, List[str]]) -> Dict[str, float]:
+def calculate_output_diversity_metrics(prompts: Dict[str, str], completions: Dict[str, List[str]]) -> Dict[str, float]:
     """
     Calculate various output diversity metrics.
     """
-    if not inputs or not outputs:
+    if not prompts or not completions:
         return {
             "empowerment": 0.0,
             "average_outputs_per_input": 0.0,
@@ -62,17 +62,17 @@ def calculate_output_diversity_metrics(inputs: Dict[str, str], outputs: Dict[str
             "output_length_variance": 0.0
         }
     
-    empowerment = calculate_empowerment(inputs, outputs)
+    empowerment = calculate_empowerment(prompts, completions)
     
-    # Calculate average number of outputs per input
-    output_counts = [len(outputs.get(input_id, [])) for input_id in inputs.keys()]
+    # Calculate average number of completions per input
+    output_counts = [len(completions.get(input_id, [])) for input_id in prompts.keys()]
     avg_outputs = np.mean(output_counts) if output_counts else 0.0
     
-    # Calculate unique outputs ratio
+    # Calculate unique completions ratio
     all_outputs = []
-    for input_id in inputs.keys():
-        if input_id in outputs:
-            all_outputs.extend(outputs[input_id])
+    for input_id in prompts.keys():
+        if input_id in completions:
+            all_outputs.extend(completions[input_id])
     
     unique_ratio = len(set(all_outputs)) / len(all_outputs) if all_outputs else 0.0
     

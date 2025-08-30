@@ -6,11 +6,11 @@ alwaysApply: true
 # Oedipus MVP Information
 
 ## Summary
-Oedipus is an observability and analytics infrastructure for AI systems. The repository contains a fully implemented MVP focused on bulk upload analysis of AI model outputs. The system provides comprehensive information-theoretic analysis of model behavior patterns and now includes comparison capabilities for multiple model outputs.
+Oedipus is an observability and analytics infrastructure for AI systems. The repository contains a fully implemented MVP focused on bulk upload analysis of AI model completions. The system provides comprehensive information-theoretic analysis of model behavior patterns and now includes comparison capabilities for multiple model completions.
 
 ## Structure
 - **app/**: Backend FastAPI application
-  - **api/**: API routes and endpoints (datasets, outputs, analysis, comparisons)
+  - **api/**: API routes and endpoints (datasets, completions, analysis, comparisons)
   - **core/**: Configuration and database setup
   - **models/**: SQLAlchemy database models
   - **schemas/**: Pydantic validation schemas
@@ -100,25 +100,25 @@ python scripts/start_frontend.py
 - API Health: http://localhost:8000/health
 
 ## Features
-- **Dataset Management**: Upload and version input datasets
+- **Dataset Management**: Upload and version prompt datasets
 - **Output Data Upload**: Support for multi-output relationships
 - **Information-Theoretic Analysis**: Metrics like entropy, information gain
 - **Visualization Dashboard**: Interactive metric visualizations
 - **Background Processing**: Celery-based task queue for analysis jobs
 - **Database Migrations**: Alembic for schema versioning
-- **Model Comparison**: Side-by-side comparison of multiple model outputs
-- **Outlier Detection**: Statistical analysis to identify anomalous outputs
+- **Model Comparison**: Side-by-side comparison of multiple model completions
+- **Outlier Detection**: Statistical analysis to identify anomalous completions
 - **Alignment Analysis**: Coverage statistics and matched input tracking
 
 ## API Endpoints
 - **Datasets**: `/api/v1/datasets/` - Create, list, and retrieve datasets
-- **Outputs**: `/api/v1/datasets/{id}/outputs` - Manage output datasets
+- **Outputs**: `/api/v1/datasets/{id}/completions` - Manage completion datasets
 - **Analysis**: `/api/v1/analysis/run` - Run analysis jobs
 - **Comparisons**: `/api/v1/comparisons/` - Create and manage model comparisons
 
 ## Performance
-- 1,000 input/output pairs: < 5 minutes
-- 10,000 inputs with multiple outputs: < 15 minutes
+- 1,000 input/completion pairs: < 5 minutes
+- 10,000 prompts with multiple completions: < 15 minutes
 - Complex analysis with all metrics: < 2 minutes
 
 ## Testing

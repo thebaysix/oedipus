@@ -2,9 +2,9 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 import uuid
 from ..models.dataset import Dataset
-from ..models.output import OutputDataset
+from ..models.completion import CompletionDataset
 from ..schemas.dataset import DatasetCreate
-from ..schemas.output import OutputDatasetCreate
+from ..schemas.completion import CompletionDatasetCreate
 
 
 class DatasetService:
@@ -16,7 +16,7 @@ class DatasetService:
         db_dataset = Dataset(
             name=dataset_data.name,
             user_id=user_id,
-            inputs=dataset_data.inputs,
+            prompts=dataset_data.prompts,
             user_metadata=dataset_data.metadata
         )
         self.db.add(db_dataset)
@@ -38,25 +38,25 @@ class DatasetService:
             .all()
         )
     
-    def create_output_dataset(self, dataset_id: uuid.UUID, output_data: OutputDatasetCreate) -> OutputDataset:
-        """Create a new output dataset."""
+    def create_completion_dataset(self, dataset_id: uuid.UUID, output_data: CompletionDatasetCreate) -> CompletionDataset:
+        """Create a new completion dataset."""
         # Verify the parent dataset exists
         dataset = self.get_dataset(dataset_id)
         if not dataset:
             raise ValueError(f"Dataset {dataset_id} not found")
         
         # Validate that output keys match input keys
-        input_keys = set(dataset.inputs.keys())
-        output_keys = set(output_data.outputs.keys())
+        input_keys = set(dataset.prompts.keys())
+        output_keys = set(output_data.completions.keys())
         
         if not output_keys.issubset(input_keys):
             missing_keys = output_keys - input_keys
-            raise ValueError(f"Output keys not found in input dataset: {missing_keys}")
+            raise ValueError(f"Output keys not found in prompt dataset: {missing_keys}")
         
-        db_output = OutputDataset(
+        db_output = CompletionDataset(
             name=output_data.name,
             dataset_id=dataset_id,
-            outputs=output_data.outputs,
+            completions=output_data.completions,
             user_metadata=output_data.metadata
         )
         self.db.add(db_output)
@@ -64,14 +64,14 @@ class DatasetService:
         self.db.refresh(db_output)
         return db_output
     
-    def get_output_dataset(self, output_id: uuid.UUID) -> Optional[OutputDataset]:
-        """Get an output dataset by ID."""
-        return self.db.query(OutputDataset).filter(OutputDataset.id == output_id).first()
+    def get_completion_dataset(self, output_id: uuid.UUID) -> Optional[CompletionDataset]:
+        """Get an completion dataset by ID."""
+        return self.db.query(CompletionDataset).filter(CompletionDataset.id == output_id).first()
     
-    def get_output_datasets(self, dataset_id: uuid.UUID) -> List[OutputDataset]:
-        """Get all output datasets for a dataset."""
+    def get_completion_datasets(self, dataset_id: uuid.UUID) -> List[CompletionDataset]:
+        """Get all completion datasets for a dataset."""
         return (
-            self.db.query(OutputDataset)
-            .filter(OutputDataset.dataset_id == dataset_id)
+            self.db.query(CompletionDataset)
+            .filter(CompletionDataset.dataset_id == dataset_id)
             .all()
         )

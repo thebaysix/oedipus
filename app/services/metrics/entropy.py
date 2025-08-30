@@ -3,17 +3,17 @@ from collections import Counter
 from typing import List, Dict, Any
 
 
-def calculate_input_entropy(inputs: Dict[str, str]) -> float:
+def calculate_input_entropy(prompts: Dict[str, str]) -> float:
     """
     Calculate entropy of input distribution.
     H(X) = -Σ p(x) log p(x)
     """
-    if not inputs:
+    if not prompts:
         return 0.0
     
     # Count frequency of each unique input
-    input_counts = Counter(inputs.values())
-    total_inputs = len(inputs)
+    input_counts = Counter(prompts.values())
+    total_inputs = len(prompts)
     
     # Calculate probabilities and entropy
     entropy = 0.0
@@ -25,12 +25,12 @@ def calculate_input_entropy(inputs: Dict[str, str]) -> float:
     return entropy
 
 
-def calculate_response_entropy(inputs: Dict[str, str], outputs: Dict[str, List[str]]) -> float:
+def calculate_response_entropy(prompts: Dict[str, str], completions: Dict[str, List[str]]) -> float:
     """
-    Calculate conditional entropy of outputs given inputs.
+    Calculate conditional entropy of completions given prompts.
     H(Y|X) = -Σ p(x,y) log p(y|x)
     """
-    if not inputs or not outputs:
+    if not prompts or not completions:
         return 0.0
     
     total_pairs = 0
@@ -38,11 +38,11 @@ def calculate_response_entropy(inputs: Dict[str, str], outputs: Dict[str, List[s
     
     # Group by input value
     input_groups = {}
-    for input_id, input_text in inputs.items():
+    for input_id, input_text in prompts.items():
         if input_text not in input_groups:
             input_groups[input_text] = []
-        if input_id in outputs:
-            input_groups[input_text].extend(outputs[input_id])
+        if input_id in completions:
+            input_groups[input_text].extend(completions[input_id])
     
     # Calculate conditional entropy for each input group
     for input_text, output_list in input_groups.items():

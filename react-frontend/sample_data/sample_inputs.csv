@@ -1,4 +1,4 @@
-input_id,input_text
+prompt_id,prompt_text
 1,"What is the capital of France?"
 2,"Explain quantum computing in simple terms"
 3,"Write a haiku about spring"

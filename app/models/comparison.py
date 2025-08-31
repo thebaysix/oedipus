@@ -14,7 +14,7 @@ class Comparison(Base):
 
     # Configuration
     datasets = Column(JSON)  # References to existing datasets (UUIDs as strings)
-    alignment_key = Column(String, default="input_id")
+    alignment_key = Column(String, default="prompt_id")
     comparison_config = Column(JSON)  # User preferences, thresholds
 
     # Results

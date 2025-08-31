@@ -38,14 +38,14 @@ def calculate_response_entropy(prompts: Dict[str, str], completions: Dict[str, L
     
     # Group by prompt value
     input_groups = {}
-    for input_id, input_text in prompts.items():
-        if input_text not in input_groups:
-            input_groups[input_text] = []
-        if input_id in completions:
-            input_groups[input_text].extend(completions[input_id])
+    for prompt_id, prompt_text in prompts.items():
+        if prompt_text not in input_groups:
+            input_groups[prompt_text] = []
+        if prompt_id in completions:
+            input_groups[prompt_text].extend(completions[prompt_id])
     
     # Calculate conditional entropy for each prompt group
-    for input_text, output_list in input_groups.items():
+    for prompt_text, output_list in input_groups.items():
         if not output_list:
             continue
             

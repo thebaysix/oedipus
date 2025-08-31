@@ -58,19 +58,22 @@ export const useUpload = () => {
         const isInput = inputErrors.length === 0;
         const isOutput = outputErrors.length === 0;
         
-        let fileType: 'prompt' | 'output' = 'prompt';
+        let fileType: 'prompt' | 'completion' = 'prompt';
         let validationErrors: string[] = [];
         
         if (isInput && !isOutput) {
           fileType = 'prompt';
+          validationErrors = []; // No errors for valid prompt file
         } else if (isOutput && !isInput) {
-          fileType = 'output';
+          fileType = 'completion';
+          validationErrors = []; // No errors for valid completion file
         } else if (isInput && isOutput) {
           // Both valid, default to prompt
           fileType = 'prompt';
+          validationErrors = []; // No errors since it's valid as prompt
         } else {
-          // Neither valid
-          validationErrors = [...inputErrors, ...outputErrors];
+          // Neither valid - show a more helpful error message
+          validationErrors = ['File must be either a prompt dataset (prompt_id, prompt_text) or completion dataset (prompt_id, completion_text)'];
         }
 
         newFiles.push({
@@ -106,7 +109,7 @@ export const useUpload = () => {
     setFiles(prev => prev.filter(f => f.id !== fileId));
   }, []);
 
-  const updateFileType = useCallback((fileId: string, type: 'prompt' | 'output') => {
+  const updateFileType = useCallback((fileId: string, type: 'prompt' | 'completion') => {
     setFiles(prev => prev.map(f => {
       if (f.id === fileId) {
         // Re-validate with new type
@@ -145,7 +148,7 @@ export const useUpload = () => {
         ));
         return result;
       } else {
-        if (!promptDatasetId) throw new Error('Prompt dataset ID required for output upload');
+        if (!promptDatasetId) throw new Error('Prompt dataset ID required for completion upload');
         const result = await createCompletionDatasetMutation.mutateAsync({
           datasetId: promptDatasetId,
           formData

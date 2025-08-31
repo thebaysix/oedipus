@@ -55,36 +55,34 @@ async def upload_completion_dataset(
         completions = {}
         reader = csv.DictReader(io.StringIO(csv_content))
         
-        # Validate required columns - accept both 'completion_text' and 'output_text' for backward compatibility
-        if 'input_id' not in reader.fieldnames:
+        # Validate required columns
+        if 'prompt_id' not in reader.fieldnames:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="CSV must have 'input_id' column"
+                detail="CSV must have 'prompt_id' column"
             )
         
         # Check for completion text column (accept both old and new names)
         completion_col = None
         if 'completion_text' in reader.fieldnames:
             completion_col = 'completion_text'
-        elif 'output_text' in reader.fieldnames:
-            completion_col = 'output_text'
         else:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="CSV must have either 'completion_text' or 'output_text' column"
+                detail="CSV must have 'completion_text' column"
             )
         
         for row in reader:
-            input_id = row.get('input_id', '').strip()
+            prompt_id = row.get('prompt_id', '').strip()
             completion_text = row.get(completion_col, '').strip()
             
-            if not input_id or not completion_text:
+            if not prompt_id or not completion_text:
                 continue  # Skip empty rows
             
-            # Handle multiple completions per input_id
-            if input_id not in completions:
-                completions[input_id] = []
-            completions[input_id].append(completion_text)
+            # Handle multiple completions per prompt_id
+            if prompt_id not in completions:
+                completions[prompt_id] = []
+            completions[prompt_id].append(completion_text)
         
         if not completions:
             raise HTTPException(

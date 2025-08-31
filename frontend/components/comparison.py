@@ -149,7 +149,7 @@ def render_comparison_creator() -> Optional[str]:
             "name": comp_name,
             "dataset_id": selected_dataset['id'],
             "completion_dataset_ids": chosen_outputs,
-            "alignment_key": "input_id",
+            "alignment_key": "prompt_id",
             "comparison_config": {"min_aligned": 10},
         }
         try:

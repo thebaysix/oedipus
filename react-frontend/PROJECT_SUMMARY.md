@@ -28,7 +28,7 @@ The Oedipus React frontend is a professional, standalone web application for com
 - Export-ready visualizations
 
 ### 4. **Smart Data Alignment**
-- Automatic input-output matching via `input_id`
+- Automatic input-output matching via `prompt_id`
 - Coverage statistics and unmatched data reporting
 - Flexible alignment key configuration
 - Missing data handling and reporting
@@ -150,14 +150,14 @@ GET    /api/v1/comparisons/{id}       # Get results
 
 ### **Prompt Dataset**
 ```csv
-input_id,input_text,category
+prompt_id,prompt_text,category
 001,"What is machine learning?",technical
 002,"How to bake a cake?",lifestyle
 ```
 
 ### **Completion Dataset**
 ```csv
-input_id,output_text,model_version
+prompt_id,completion_text,model_version
 001,"Machine learning is a branch of...",v1.0
 002,"To bake a cake, start by...",v1.0
 ```

@@ -115,7 +115,7 @@ function App() {
         name: `Comparison ${new Date().toLocaleString()}`,
         dataset_id: datasets[0].id,
         completion_dataset_ids: allCompletionDatasets.slice(0, 2).map(d => d.id), // Compare first two completions
-        alignment_key: 'input_id'
+        alignment_key: 'prompt_id'
       });
       
       setSelectedComparison(result.id);
@@ -272,7 +272,7 @@ function App() {
                   <div>
                     <div className="font-medium">{completionDataset.name} <span className="text-xs bg-green-100 text-green-800 px-1 rounded">COMPLETIONS</span></div>
                     <div className="text-sm text-gray-500">
-                      {completionDataset.metadata?.total_outputs || 0} completions • Created {new Date(completionDataset.created_at).toLocaleDateString()}
+                      {completionDataset.metadata?.total_completions || 0} completions across {completionDataset.metadata?.unique_inputs || 0} unique prompts • Created {new Date(completionDataset.created_at).toLocaleDateString()}
                     </div>
                   </div>
                 </div>

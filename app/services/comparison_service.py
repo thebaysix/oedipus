@@ -95,16 +95,16 @@ class ComparisonService:
 
         # Construct aligned rows for matched intersection (cap to 200 rows to keep payload small)
         aligned_rows = []
-        for input_id in list(matched_intersection)[:200]:
+        for prompt_id in list(matched_intersection)[:200]:
             row_outputs: Dict[str, Any] = {}
             row_meta: Dict[str, Any] = {}
             for ds_id, ds_outputs in outputs_by_dataset.items():
                 name = dataset_name_by_id.get(ds_id, ds_id)
-                row_outputs[name] = ds_outputs.get(input_id, None)
+                row_outputs[name] = ds_outputs.get(prompt_id, None)
                 row_meta[name] = {}
             aligned_rows.append({
-                "inputId": input_id,
-                "inputText": prompts.get(input_id, ""),
+                "inputId": prompt_id,
+                "inputText": prompts.get(prompt_id, ""),
                 "completions": row_outputs,
                 "metadata": row_meta,
             })

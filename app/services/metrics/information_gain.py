@@ -14,9 +14,9 @@ def calculate_information_gain(prompts: Dict[str, str], completions: Dict[str, L
     
     # Calculate output entropy H(Y)
     all_outputs = []
-    for input_id in prompts.keys():
-        if input_id in completions:
-            all_outputs.extend(completions[input_id])
+    for prompt_id in prompts.keys():
+        if prompt_id in completions:
+            all_outputs.extend(completions[prompt_id])
     
     if not all_outputs:
         return 0.0

@@ -16,7 +16,7 @@ def _normalize_comp(c: Any) -> Dict[str, Any]:
         "name": getattr(c, "name"),
         "created_at": getattr(c, "created_at"),
         "datasets": getattr(c, "datasets", None) or [],
-        "alignment_key": getattr(c, "alignment_key", None) or "input_id",
+        "alignment_key": getattr(c, "alignment_key", None) or "prompt_id",
         "comparison_config": getattr(c, "comparison_config", None) or {},
         "statistical_results": getattr(c, "statistical_results", None) or {},
         "automated_insights": getattr(c, "automated_insights", None) or [],

@@ -126,21 +126,21 @@ react-frontend/
 
 ### Prompt Dataset
 ```csv
-input_id,input_text,category
+prompt_id,prompt_text,category
 001,What is machine learning?,technical
 002,How to bake a cake?,lifestyle
 ```
 
 ### Completion Dataset
 ```csv
-input_id,output_text,model_version,timestamp
+prompt_id,completion_text,model_version,timestamp
 001,Machine learning is...,v1.0,2024-01-01
 002,To bake a cake you...,v1.0,2024-01-01
 ```
 
 **Required Columns**:
-- Prompt Dataset: `input_id`, `input_text`
-- Completion Dataset: `input_id`, `output_text`
+- Prompt Dataset: `prompt_id`, `prompt_text`
+- Completion Dataset: `prompt_id`, `completion_text`
 
 ## Troubleshooting
 

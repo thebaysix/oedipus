@@ -13,7 +13,7 @@ class CompletionDataset(Base):
     name = Column(String, nullable=False)
     dataset_id = Column(UUID(as_uuid=True), ForeignKey("datasets.id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    completions = Column(JSON, nullable=False)  # mapping (dataset_name, input_id) -> [output_strings]
+    completions = Column(JSON, nullable=False)  # mapping (dataset_name, prompt_id) -> [output_strings]
     user_metadata = Column('metadata', JSON, default=dict)
     
     # Relationship

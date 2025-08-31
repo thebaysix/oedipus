@@ -1,10 +1,15 @@
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any
 import uuid
+import asyncio
+import time
+from datetime import datetime
 from ..models.dataset import Dataset
 from ..models.completion import CompletionDataset
 from ..models.comparison import Comparison
 from ..schemas.comparison import ComparisonCreate
+from .metrics.statistical_tests import run_statistical_tests, calculate_summary_statistics
+from .metrics.basic_metrics import calculate_character_metrics, calculate_token_metrics
 
 
 class ComparisonService:
@@ -48,6 +53,76 @@ class ComparisonService:
         self.db.add(comp)
         self.db.commit()
         self.db.refresh(comp)
+        return comp
+
+    def run_comparison_analysis(self, comparison_id: uuid.UUID) -> Comparison:
+        """Run the statistical analysis for a comparison."""
+        comp = self.get_comparison(comparison_id)
+        if not comp:
+            raise ValueError(f"Comparison {comparison_id} not found")
+        
+        if comp.status != "pending":
+            return comp
+        
+        # Update status to running
+        comp.status = "running"
+        updated_results = dict(comp.statistical_results)
+        updated_results["progress"] = {"step": "statistical_analysis", "message": "Computing statistical metrics..."}
+        comp.statistical_results = updated_results
+        self.db.commit()
+        
+        try:
+            # Get the datasets
+            dataset_id = uuid.UUID(comp.datasets[0])
+            completion_dataset_ids = [uuid.UUID(id_str) for id_str in comp.datasets[1:]]
+            
+            dataset = self.db.query(Dataset).filter(Dataset.id == dataset_id).first()
+            completions = (
+                self.db.query(CompletionDataset)
+                .filter(CompletionDataset.id.in_(completion_dataset_ids))
+                .all()
+            )
+            
+            # Simulate realistic analysis timing with progress updates
+            time.sleep(1)
+            
+            # Update progress: insights generation
+            updated_results = dict(comp.statistical_results)
+            updated_results["progress"] = {"step": "insights", "message": "Generating automated insights..."}
+            comp.statistical_results = updated_results
+            self.db.commit()
+            
+            time.sleep(1)
+            
+            # Update progress: visualization prep
+            updated_results = dict(comp.statistical_results)
+            updated_results["progress"] = {"step": "visualization", "message": "Preparing visualizations..."}
+            comp.statistical_results = updated_results
+            self.db.commit()
+            
+            time.sleep(1)
+            
+            # Run statistical analysis
+            alignment_result = comp.statistical_results.get("alignment", {})
+            statistical_results = self._run_comparison_analysis(dataset, completions, alignment_result)
+            
+            # Create a new dict to ensure SQLAlchemy detects the change
+            updated_results = dict(comp.statistical_results)
+            updated_results.update(statistical_results)
+            comp.statistical_results = updated_results
+            comp.automated_insights = statistical_results.get("insights", [])
+            comp.status = "completed"
+            self.db.commit()
+            
+        except Exception as e:
+            comp.status = "failed"
+            # Create a new dict to ensure SQLAlchemy detects the change
+            updated_results = dict(comp.statistical_results)
+            updated_results["error"] = str(e)
+            comp.statistical_results = updated_results
+            self.db.commit()
+            raise
+        
         return comp
 
     def list_comparisons(self, skip: int = 0, limit: int = 100) -> List[Comparison]:
@@ -118,3 +193,50 @@ class ComparisonService:
                 "coveragePercentage": round(coverage, 2),
             },
         }
+    
+    def _run_comparison_analysis(self, dataset: Dataset, completions: List[CompletionDataset], alignment_result: Dict[str, Any]) -> Dict[str, Any]:
+        """Run statistical analysis comparing multiple completion datasets."""
+        # Prepare data for statistical analysis
+        completions_by_dataset = {}
+        for completion_dataset in completions:
+            completions_by_dataset[completion_dataset.name] = completion_dataset.completions or {}
+        
+        # Run statistical tests
+        metrics = run_statistical_tests(completions_by_dataset)
+        
+        # Generate automated insights
+        insights = self._generate_insights(metrics, completions_by_dataset)
+        
+        return {
+            "metrics": metrics,
+            "summary_statistics": calculate_summary_statistics(completions_by_dataset),
+            "insights": insights
+        }
+    
+    def _generate_insights(self, metrics: List[Dict[str, Any]], completions_by_dataset: Dict[str, Dict[str, List[str]]]) -> List[str]:
+        """Generate automated insights from statistical analysis."""
+        insights = []
+        
+        # Find significant differences
+        significant_metrics = [m for m in metrics if m.get("statistical_significance", 1.0) < 0.05]
+        if significant_metrics:
+            insights.append(f"Found {len(significant_metrics)} statistically significant differences between datasets.")
+            
+            # Highlight the most significant
+            most_significant = min(significant_metrics, key=lambda x: x.get("statistical_significance", 1.0))
+            insights.append(f"Most significant difference: {most_significant['name']} (p={most_significant['statistical_significance']:.4f})")
+        
+        # Dataset size comparison
+        dataset_sizes = {name: sum(len(completions) for completions in dataset.values()) 
+                        for name, dataset in completions_by_dataset.items()}
+        if dataset_sizes:
+            largest_dataset = max(dataset_sizes.items(), key=lambda x: x[1])
+            smallest_dataset = min(dataset_sizes.items(), key=lambda x: x[1])
+            insights.append(f"Dataset sizes range from {smallest_dataset[1]} ({smallest_dataset[0]}) to {largest_dataset[1]} ({largest_dataset[0]}) completions.")
+        
+        # Effect size insights
+        large_effects = [m for m in metrics if abs(m.get("effect_size", 0)) > 0.8]
+        if large_effects:
+            insights.append(f"Found {len(large_effects)} metrics with large effect sizes (>0.8), indicating substantial practical differences.")
+        
+        return insights

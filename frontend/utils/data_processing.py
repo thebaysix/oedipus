@@ -31,7 +31,7 @@ def validate_input_json(json_data: str) -> Tuple[bool, str, Dict]:
 def validate_output_json(json_data: str, input_keys: List[str]) -> Tuple[bool, str, Dict]:
     """
     Validate output JSON format.
-    Expected format: {input_id: [output_string1, output_string2, ...]}
+    Expected format: {prompt_id: [output_string1, output_string2, ...]}
     """
     try:
         data = json.loads(json_data)

@@ -34,8 +34,8 @@ Main App | Diagnostic | Simple Test | Debug Hooks
 - **Responsive layout** optimized for data analysis workflows
 
 **Functionality**:
-- Upload prompt datasets (CSV format with `input_id`, `input_text`)
-- Upload completion datasets (CSV format with `input_id`, `output_text`)
+- Upload prompt datasets (CSV format with `prompt_id`, `prompt_text`)
+- Upload completion datasets (CSV format with `prompt_id`, `completion_text`)
 - Data validation and preview before processing
 - Create comparative analyses between model completions
 - Interactive visualizations using Recharts

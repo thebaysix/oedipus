@@ -16,9 +16,9 @@ def calculate_empowerment(prompts: Dict[str, str], completions: Dict[str, List[s
     
     # Group completions by prompt
     input_output_groups = defaultdict(list)
-    for input_id, input_text in prompts.items():
-        if input_id in completions:
-            input_output_groups[input_text].extend(completions[input_id])
+    for prompt_id, prompt_text in prompts.items():
+        if prompt_id in completions:
+            input_output_groups[prompt_text].extend(completions[prompt_id])
     
     if not input_output_groups:
         return 0.0
@@ -27,7 +27,7 @@ def calculate_empowerment(prompts: Dict[str, str], completions: Dict[str, List[s
     total_weight = 0.0
     
     # Calculate empowerment for each prompt group
-    for input_text, output_list in input_output_groups.items():
+    for prompt_text, output_list in input_output_groups.items():
         if len(output_list) < 2:
             continue
         
@@ -65,14 +65,14 @@ def calculate_output_diversity_metrics(prompts: Dict[str, str], completions: Dic
     empowerment = calculate_empowerment(prompts, completions)
     
     # Calculate average number of completions per prompt
-    output_counts = [len(completions.get(input_id, [])) for input_id in prompts.keys()]
+    output_counts = [len(completions.get(prompt_id, [])) for prompt_id in prompts.keys()]
     avg_outputs = np.mean(output_counts) if output_counts else 0.0
     
     # Calculate unique completions ratio
     all_outputs = []
-    for input_id in prompts.keys():
-        if input_id in completions:
-            all_outputs.extend(completions[input_id])
+    for prompt_id in prompts.keys():
+        if prompt_id in completions:
+            all_outputs.extend(completions[prompt_id])
     
     unique_ratio = len(set(all_outputs)) / len(all_outputs) if all_outputs else 0.0
     

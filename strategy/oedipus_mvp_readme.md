@@ -45,7 +45,7 @@ class CompletionDataset(Base):
     name: str
     dataset_id: UUID  # foreign key to Dataset
     created_at: datetime
-    completions: Dict  # mapping (dataset_name, input_id) -> [output_strings]
+    completions: Dict  # mapping (dataset_name, prompt_id) -> [output_strings]
     metadata: Dict
 
 class AnalysisJob(Base):
@@ -104,7 +104,7 @@ User Upload → Data Validation → Storage → Analysis Queue → Metrics Compu
 
 ### 2. Output Data Upload
 - **Multi-Output Support**: One-to-many input→output relationships
-- **Structured Format**: JSON mapping `{(dataset_name, input_id): [output_array]}`
+- **Structured Format**: JSON mapping `{(dataset_name, prompt_id): [output_array]}`
 - **Validation**: Ensure output data matches existing prompt datasets
 
 ### 3. Information-Theoretic Analysis

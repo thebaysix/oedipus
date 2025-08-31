@@ -6,7 +6,7 @@ import uuid
 
 class CompletionDatasetCreate(BaseModel):
     name: str
-    completions: Dict[str, List[str]]  # mapping input_id -> [output_strings]
+    completions: Dict[str, List[str]]  # mapping prompt_id -> [output_strings]
     metadata: Optional[Dict[str, Any]] = {}
 
 

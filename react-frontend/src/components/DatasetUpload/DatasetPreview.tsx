@@ -7,7 +7,7 @@ import { formatFileSize } from '../../utils/dataProcessing';
 interface DatasetPreviewProps {
   file: UploadedFile;
   onRemove: (fileId: string) => void;
-  onTypeChange: (fileId: string, type: 'input' | 'output') => void;
+  onTypeChange: (fileId: string, type: 'prompt' | 'completion') => void;
   onUpload: (fileId: string, promptDatasetId?: string) => void;
   promptDatasets?: Array<{ id: string; name: string }>;
   disabled?: boolean;
@@ -48,7 +48,7 @@ export const DatasetPreview: React.FC<DatasetPreviewProps> = ({
   };
 
   const canUpload = file.status === 'pending' && !file.error;
-  const needsPromptDataset = file.type === 'output' && promptDatasets.length > 0;
+  const needsPromptDataset = file.type === 'completion' && promptDatasets.length > 0;
 
   const handleUpload = () => {
     if (needsPromptDataset) {
@@ -87,12 +87,12 @@ export const DatasetPreview: React.FC<DatasetPreviewProps> = ({
         <span className="text-sm text-gray-600">Type:</span>
         <div className="flex gap-2">
           <button
-            onClick={() => onTypeChange(file.id, 'input')}
+            onClick={() => onTypeChange(file.id, 'prompt')}
             disabled={disabled || file.status !== 'pending'}
             className={clsx(
               'px-3 py-1 rounded-md text-xs font-medium transition-colors',
               'disabled:opacity-50 disabled:cursor-not-allowed',
-              file.type === 'input'
+              file.type === 'prompt'
                 ? 'bg-blue-100 text-blue-700 border border-blue-200'
                 : 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-blue-50'
             )}
@@ -101,12 +101,12 @@ export const DatasetPreview: React.FC<DatasetPreviewProps> = ({
             Prompt Dataset
           </button>
           <button
-            onClick={() => onTypeChange(file.id, 'output')}
+            onClick={() => onTypeChange(file.id, 'completion')}
             disabled={disabled || file.status !== 'pending'}
             className={clsx(
               'px-3 py-1 rounded-md text-xs font-medium transition-colors',
               'disabled:opacity-50 disabled:cursor-not-allowed',
-              file.type === 'output'
+              file.type === 'completion'
                 ? 'bg-green-100 text-green-700 border border-green-200'
                 : 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-green-50'
             )}

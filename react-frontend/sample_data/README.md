@@ -5,21 +5,21 @@ This directory contains sample datasets for testing the Oedipus React Frontend c
 ## Files
 
 ### `sample_inputs.csv`
-- **100 input records** with `input_id` and `input_text` columns
-- 1:1 mapping of input_id to input_text
+- **100 input records** with `prompt_id` and `prompt_text` columns
+- 1:1 mapping of prompt_id to prompt_text
 - Diverse topics: science, technology, nature, AI, physics, etc.
 - Suitable for testing data upload, validation, and preview functionality
 
 ### `sample_outputs_model_a.csv` 
 - **100 output records** from "Model A"
-- Format: `input_id`, `output_text`
+- Format: `prompt_id`, `completion_text`
 - Some input_ids have multiple completions (1:many relationship)
 - Academic/technical writing style
 - Detailed, comprehensive responses
 
 ### `sample_outputs_model_b.csv`
 - **56 output records** from "Model B" 
-- Format: `input_id`, `output_text`
+- Format: `prompt_id`, `completion_text`
 - Conversational, engaging writing style
 - Uses analogies and simplified explanations
 - Some overlap with Model A prompts for comparison testing

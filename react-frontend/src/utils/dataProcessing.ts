@@ -43,12 +43,12 @@ export const parseCSVFile = (file: File): Promise<ParseResult> => {
 export const validatePromptDataset = (headers: string[]): string[] => {
   const errors: string[] = [];
   
-  if (!headers.includes('input_id')) {
-    errors.push('Missing required column: input_id');
+  if (!headers.includes('prompt_id')) {
+    errors.push('Missing required column: prompt_id');
   }
   
-  if (!headers.includes('input_text')) {
-    errors.push('Missing required column: input_text');
+  if (!headers.includes('prompt_text')) {
+    errors.push('Missing required column: prompt_text');
   }
   
   return errors;
@@ -57,12 +57,12 @@ export const validatePromptDataset = (headers: string[]): string[] => {
 export const validateCompletionDataset = (headers: string[]): string[] => {
   const errors: string[] = [];
   
-  if (!headers.includes('input_id')) {
-    errors.push('Missing required column: input_id');
+  if (!headers.includes('prompt_id')) {
+    errors.push('Missing required column: prompt_id');
   }
   
-  if (!headers.includes('output_text')) {
-    errors.push('Missing required column: output_text');
+  if (!headers.includes('completion_text')) {
+    errors.push('Missing required column: completion_text');
   }
   
   return errors;

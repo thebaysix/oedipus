@@ -90,12 +90,12 @@ python scripts/start_frontend.py
 
 ### 1. Upload Prompt Dataset
 - Navigate to "Upload Data" page
-- Create JSON mapping: `{"input_id": "prompt_text"}`
+- Create JSON mapping: `{"prompt_id": "prompt_text"}`
 - Use sample data or upload your own
 
 ### 2. Upload Completion Dataset
 - Select your prompt dataset
-- Create JSON mapping: `{"input_id": ["output1", "output2"]}`
+- Create JSON mapping: `{"prompt_id": ["completion1", "completion2"]}`
 - Validate against prompt dataset
 
 ### 3. Run Analysis

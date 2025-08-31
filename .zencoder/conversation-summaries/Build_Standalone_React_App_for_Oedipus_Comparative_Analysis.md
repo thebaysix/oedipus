@@ -85,7 +85,7 @@ class Comparison(Base):
     created_at: datetime = Column(DateTime, default=datetime.utcnow)
     # Configuration
     datasets: List[UUID] = Column(JSON)  # References to existing datasets
-    alignment_key: str = Column(String, default="input_id")
+    alignment_key: str = Column(String, default="prompt_id")
     comparison_config: Dict = Column(JSON)  # User preferences, thresholds
     # Results
     statistical_results: Dict = Column(JSON)  # Test outcomes, p-values, effect sizes
@@ -256,7 +256,7 @@ class Comparison(Base):
     created_at: datetime = Column(DateTime, default=datetime.utcnow)
     # Configuration
     datasets: List[UUID] = Column(JSON)  # References to existing datasets
-    alignment_key: str = Column(String, default="input_id")
+    alignment_key: str = Column(String, default="prompt_id")
     comparison_config: Dict = Column(JSON)  # User preferences, thresholds
     # Results
     statistical_results: Dict = Column(JSON)  # Test outcomes, p-values, effect sizes

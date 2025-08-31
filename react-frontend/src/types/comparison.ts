@@ -3,7 +3,7 @@ export interface Dataset {
   name: string;
   user_id: string;
   created_at: string;
-  prompts: Record<string, string>; // mapping input_id -> input_text
+  prompts: Record<string, string>; // mapping prompt_id -> prompt_text
   metadata: Record<string, any>;
   description?: string;
   input_count?: number; // computed field
@@ -14,7 +14,7 @@ export interface CompletionDataset {
   name: string;
   dataset_id: string;
   created_at: string;
-  completions: Record<string, string[]>; // mapping input_id -> output_texts
+  completions: Record<string, string[]>; // mapping prompt_id -> output_texts
   metadata: Record<string, any>;
   output_count?: number; // computed field
 }
@@ -63,7 +63,7 @@ export interface UploadedFile {
   preview: string[][];
   headers: string[];
   rowCount: number;
-  type: 'prompt' | 'output';
+  type: 'prompt' | 'completion';
   status: 'pending' | 'uploading' | 'completed' | 'error';
   error?: string;
 }

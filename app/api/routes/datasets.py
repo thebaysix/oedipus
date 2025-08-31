@@ -38,20 +38,20 @@ async def upload_dataset(
         reader = csv.DictReader(io.StringIO(csv_content))
         
         # Validate required columns
-        if 'input_id' not in reader.fieldnames or 'input_text' not in reader.fieldnames:
+        if 'prompt_id' not in reader.fieldnames or 'prompt_text' not in reader.fieldnames:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="CSV must have 'input_id' and 'input_text' columns"
+                detail="CSV must have 'prompt_id' and 'prompt_text' columns"
             )
         
         for row in reader:
-            input_id = row.get('input_id', '').strip()
-            input_text = row.get('input_text', '').strip()
+            prompt_id = row.get('prompt_id', '').strip()
+            prompt_text = row.get('prompt_text', '').strip()
             
-            if not input_id or not input_text:
+            if not prompt_id or not prompt_text:
                 continue  # Skip empty rows
                 
-            prompts[input_id] = input_text
+            prompts[prompt_id] = prompt_text
         
         if not prompts:
             raise HTTPException(

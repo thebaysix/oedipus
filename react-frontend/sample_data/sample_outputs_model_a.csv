@@ -1,4 +1,4 @@
-input_id,output_text
+prompt_id,completion_text
 1,"The capital of France is Paris, located in the north-central part of the country along the Seine River."
 2,"Quantum computing uses quantum bits (qubits) that can exist in multiple states simultaneously, allowing for exponentially faster calculations than classical computers."
 3,"Cherry blossoms bloom, Gentle breeze carries sweet scent, Spring awakens life."

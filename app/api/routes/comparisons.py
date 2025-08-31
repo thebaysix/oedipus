@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any
 import uuid
@@ -7,6 +7,20 @@ from ...services.comparison_service import ComparisonService
 from ...schemas.comparison import ComparisonCreate, ComparisonResponse
 
 router = APIRouter(prefix="/api/v1/comparisons", tags=["comparisons"])
+
+
+def _run_comparison_analysis_task(comparison_id: str):
+    """Background task to run comparison analysis."""
+    from ...core.database import SessionLocal
+    
+    db = SessionLocal()
+    try:
+        service = ComparisonService(db)
+        service.run_comparison_analysis(uuid.UUID(comparison_id))
+    except Exception as e:
+        print(f"Error running comparison analysis: {e}")
+    finally:
+        db.close()
 
 
 def _normalize_comp(c: Any) -> Dict[str, Any]:
@@ -27,11 +41,16 @@ def _normalize_comp(c: Any) -> Dict[str, Any]:
 @router.post("/create", response_model=ComparisonResponse, status_code=status.HTTP_201_CREATED)
 def create_comparison(
     payload: ComparisonCreate,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
 ):
     try:
         service = ComparisonService(db)
         comp = service.create_comparison(payload)
+        
+        # Trigger analysis in background
+        background_tasks.add_task(_run_comparison_analysis_task, str(comp.id))
+        
         return _normalize_comp(comp)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

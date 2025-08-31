@@ -50,7 +50,7 @@ export const FilterControls: React.FC<FilterControlsProps> = ({
           <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
           <input
             type="text"
-            placeholder="Search inputs and outputs..."
+            placeholder="Search prompts and completions..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             className="flex-1 px-3 py-1 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"

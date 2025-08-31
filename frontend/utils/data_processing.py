@@ -44,7 +44,7 @@ def validate_output_json(json_data: str, input_keys: List[str]) -> Tuple[bool, s
         
         for key, value in data.items():
             if key not in input_key_set:
-                return False, f"Output key '{key}' not found in input dataset", {}
+                return False, f"Output key '{key}' not found in prompt dataset", {}
             
             if not isinstance(value, list):
                 return False, f"All values must be lists. Found {type(value)} for key '{key}'", {}

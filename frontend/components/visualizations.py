@@ -22,7 +22,7 @@ def render_metrics_overview(results: Dict[str, Any]):
         st.metric(
             "Information Gain",
             f"{info_theory.get('information_gain', 0):.4f}",
-            help="Mutual information between inputs and outputs"
+            help="Mutual information between prompts and completions"
         )
     
     with col2:
@@ -36,14 +36,14 @@ def render_metrics_overview(results: Dict[str, Any]):
         st.metric(
             "Total Outputs",
             summary.get('total_outputs', 0),
-            help="Total number of outputs generated"
+            help="Total number of completions generated"
         )
     
     with col4:
         st.metric(
             "Unique Outputs",
             summary.get('unique_outputs', 0),
-            help="Number of unique outputs"
+            help="Number of unique completions"
         )
 
 
@@ -154,9 +154,9 @@ def render_diversity_metrics(results: Dict[str, Any], key: str | None = None):
         ],
         "Description": [
             "Model decision influence on output diversity",
-            "Ratio of unique to total outputs",
-            "Average number of outputs per input (scaled)",
-            "Fraction of inputs that have outputs"
+            "Ratio of unique to total completions",
+            "Average number of completions per input (scaled)",
+            "Fraction of prompts that have completions"
         ]
     }
     

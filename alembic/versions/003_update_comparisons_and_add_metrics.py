@@ -32,7 +32,7 @@ def upgrade() -> None:
             """
             UPDATE comparisons
             SET datasets = (
-                (json_build_array(dataset_id)::jsonb) || COALESCE(output_dataset_ids::jsonb, '[]'::jsonb)
+                (json_build_array(dataset_id)::jsonb) || COALESCE(completion_dataset_ids::jsonb, '[]'::jsonb)
             )::json
             WHERE datasets IS NULL
             """
@@ -49,9 +49,9 @@ def upgrade() -> None:
                 batch_op.drop_column('alignment_stats')
             except Exception:
                 pass
-            # Drop output_dataset_ids and dataset_id to match new model
+            # Drop completion_dataset_ids and dataset_id to match new model
             try:
-                batch_op.drop_column('output_dataset_ids')
+                batch_op.drop_column('completion_dataset_ids')
             except Exception:
                 pass
             try:

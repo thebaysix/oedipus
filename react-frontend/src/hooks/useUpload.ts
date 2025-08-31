@@ -1,8 +1,8 @@
 import { useState, useCallback } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../utils/api';
-import { parseCSVFile, validateInputDataset, validateOutputDataset, generatePreview } from '../utils/dataProcessing';
-import { UploadedFile, Dataset, OutputDataset } from '../types/comparison';
+import { parseCSVFile, validatePromptDataset, validateCompletionDataset, generatePreview } from '../utils/dataProcessing';
+import { UploadedFile, Dataset, CompletionDataset } from '../types/comparison';
 
 export const useUpload = () => {
   const [files, setFiles] = useState<UploadedFile[]>([]);
@@ -17,15 +17,15 @@ export const useUpload = () => {
     }
   });
 
-  const createOutputDatasetMutation = useMutation({
+  const createCompletionDatasetMutation = useMutation({
     mutationFn: async ({ datasetId, formData }: { datasetId: string, formData: FormData }) => {
-      return apiClient.postFormData<OutputDataset>(`/api/v1/datasets/${datasetId}/outputs/upload`, formData);
+      return apiClient.postFormData<CompletionDataset>(`/api/v1/datasets/${datasetId}/completions/upload`, formData);
     },
     onSuccess: () => {
       // Invalidate and refetch relevant queries after output upload
       queryClient.invalidateQueries({ queryKey: ['datasets'] });
-      queryClient.invalidateQueries({ queryKey: ['all-outputs'] });
-      queryClient.refetchQueries({ queryKey: ['all-outputs'] });
+      queryClient.invalidateQueries({ queryKey: ['all-completions'] });
+      queryClient.refetchQueries({ queryKey: ['all-completions'] });
     }
   });
 
@@ -44,7 +44,7 @@ export const useUpload = () => {
             preview: [],
             headers: [],
             rowCount: 0,
-            type: 'input',
+            type: 'prompt',
             status: 'error',
             error: parseResult.errors.join(', ')
           });
@@ -52,22 +52,22 @@ export const useUpload = () => {
         }
 
         // Detect file type based on headers
-        const inputErrors = validateInputDataset(parseResult.headers);
-        const outputErrors = validateOutputDataset(parseResult.headers);
+        const inputErrors = validatePromptDataset(parseResult.headers);
+        const outputErrors = validateCompletionDataset(parseResult.headers);
         
         const isInput = inputErrors.length === 0;
         const isOutput = outputErrors.length === 0;
         
-        let fileType: 'input' | 'output' = 'input';
+        let fileType: 'prompt' | 'output' = 'prompt';
         let validationErrors: string[] = [];
         
         if (isInput && !isOutput) {
-          fileType = 'input';
+          fileType = 'prompt';
         } else if (isOutput && !isInput) {
           fileType = 'output';
         } else if (isInput && isOutput) {
-          // Both valid, default to input
-          fileType = 'input';
+          // Both valid, default to prompt
+          fileType = 'prompt';
         } else {
           // Neither valid
           validationErrors = [...inputErrors, ...outputErrors];
@@ -92,7 +92,7 @@ export const useUpload = () => {
           preview: [],
           headers: [],
           rowCount: 0,
-          type: 'input',
+          type: 'prompt',
           status: 'error',
           error: error instanceof Error ? error.message : 'Unknown error'
         });
@@ -106,13 +106,13 @@ export const useUpload = () => {
     setFiles(prev => prev.filter(f => f.id !== fileId));
   }, []);
 
-  const updateFileType = useCallback((fileId: string, type: 'input' | 'output') => {
+  const updateFileType = useCallback((fileId: string, type: 'prompt' | 'output') => {
     setFiles(prev => prev.map(f => {
       if (f.id === fileId) {
         // Re-validate with new type
-        const validationErrors = type === 'input' 
-          ? validateInputDataset(f.headers)
-          : validateOutputDataset(f.headers);
+        const validationErrors = type === 'prompt' 
+          ? validatePromptDataset(f.headers)
+          : validateCompletionDataset(f.headers);
         
         return {
           ...f,
@@ -125,7 +125,7 @@ export const useUpload = () => {
     }));
   }, []);
 
-  const uploadFile = useCallback(async (fileId: string, inputDatasetId?: string) => {
+  const uploadFile = useCallback(async (fileId: string, promptDatasetId?: string) => {
     const file = files.find(f => f.id === fileId);
     if (!file) return;
 
@@ -138,16 +138,16 @@ export const useUpload = () => {
       formData.append('file', file.file);
       formData.append('name', file.name.replace('.csv', ''));
 
-      if (file.type === 'input') {
+      if (file.type === 'prompt') {
         const result = await createDatasetMutation.mutateAsync(formData);
         setFiles(prev => prev.map(f => 
           f.id === fileId ? { ...f, status: 'completed' } : f
         ));
         return result;
       } else {
-        if (!inputDatasetId) throw new Error('Input dataset ID required for output upload');
-        const result = await createOutputDatasetMutation.mutateAsync({
-          datasetId: inputDatasetId,
+        if (!promptDatasetId) throw new Error('Prompt dataset ID required for output upload');
+        const result = await createCompletionDatasetMutation.mutateAsync({
+          datasetId: promptDatasetId,
           formData
         });
         setFiles(prev => prev.map(f => 
@@ -165,7 +165,7 @@ export const useUpload = () => {
       ));
       throw error;
     }
-  }, [files, createDatasetMutation, createOutputDatasetMutation]);
+  }, [files, createDatasetMutation, createCompletionDatasetMutation]);
 
   const clearFiles = useCallback(() => {
     setFiles([]);
@@ -178,6 +178,6 @@ export const useUpload = () => {
     updateFileType,
     uploadFile,
     clearFiles,
-    isUploading: createDatasetMutation.isPending || createOutputDatasetMutation.isPending
+    isUploading: createDatasetMutation.isPending || createCompletionDatasetMutation.isPending
   };
 };

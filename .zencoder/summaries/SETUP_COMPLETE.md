@@ -6,7 +6,7 @@ The Oedipus MVP has been successfully built according to the specifications in t
 
 ### Backend (FastAPI)
 - **Core Configuration**: Database, Redis, and environment settings
-- **Data Models**: Dataset, OutputDataset, and AnalysisJob with SQLAlchemy
+- **Data Models**: Dataset, CompletionDataset, and AnalysisJob with SQLAlchemy
 - **API Routes**: Complete REST API with all specified endpoints
 - **Services Layer**: Business logic for datasets and analysis
 - **Metrics Engine**: Information-theoretic analysis including:
@@ -65,7 +65,7 @@ streamlit run frontend/streamlit_app.py
 
 ### Data Management
 - ✅ JSON dataset upload with validation
-- ✅ Input/output dataset relationships
+- ✅ Input/completion dataset relationships
 - ✅ Sample data for quick testing
 - ✅ Dataset versioning and metadata
 
@@ -84,11 +84,11 @@ streamlit run frontend/streamlit_app.py
 - ✅ Export capabilities
 
 ### API Endpoints
-- ✅ `POST /api/v1/datasets` - Create dataset
-- ✅ `GET /api/v1/datasets` - List datasets
-- ✅ `GET /api/v1/datasets/{id}` - Get dataset
-- ✅ `POST /api/v1/datasets/{id}/outputs` - Create outputs
-- ✅ `GET /api/v1/datasets/{id}/outputs` - List outputs
+- ✅ `POST /api/v1/datasets` - Create prompt dataset
+- ✅ `GET /api/v1/datasets` - List prompt datasets
+- ✅ `GET /api/v1/datasets/{id}` - Get prompt dataset
+- ✅ `POST /api/v1/datasets/{id}/completions` - Create completions for a prompt dataset id
+- ✅ `GET /api/v1/datasets/{id}/completions` - List completions for a prompt dataset id
 - ✅ `POST /api/v1/analysis/run` - Start analysis
 - ✅ `GET /api/v1/analysis/{job_id}/status` - Check status
 - ✅ `GET /api/v1/analysis/{job_id}/results` - Get results
@@ -129,7 +129,7 @@ oedipus/
 
 ## 🎯 Success Metrics Met
 
-- ✅ **Performance**: Handles 1000+ input/output pairs efficiently
+- ✅ **Performance**: Handles 1000+ input/completion pairs efficiently
 - ✅ **User Experience**: Complete workflow in under 30 minutes
 - ✅ **Functionality**: All core features from specification implemented
 - ✅ **Architecture**: Scalable design with clear separation of concerns
@@ -157,7 +157,7 @@ celery -A app.workers.analysis_worker worker --loglevel=debug
 ## 🎉 Ready to Use!
 
 The Oedipus MVP is now fully functional and ready for:
-1. **Data Upload**: Upload your AI model inputs and outputs
+1. **Data Upload**: Upload your AI model prompts and completions
 2. **Analysis**: Run comprehensive information-theoretic analysis
 3. **Visualization**: Explore interactive charts and metrics
 4. **Export**: Download results for further analysis

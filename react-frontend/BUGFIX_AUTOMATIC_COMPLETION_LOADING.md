@@ -8,11 +8,11 @@
 ## Root Cause Analysis
 
 ### Technical Details
-1. **React Query Caching**: When the app first loaded, no completion datasets existed, so React Query cached an empty result `[]` for the `useAllOutputDatasets` hook.
+1. **React Query Caching**: When the app first loaded, no completion datasets existed, so React Query cached an empty result `[]` for the `useAllCompletionDatasets` hook.
 
 2. **Cache Invalidation Timing**: When users uploaded completion datasets, React Query wasn't invalidating the cached empty result because:
    - The query key remained the same (same dataset IDs)
-   - Cache invalidation only happened on dataset queries, not output dataset queries
+   - Cache invalidation only happened on dataset queries, not completion dataset queries
    - The upload success callback wasn't triggering a refetch of completion data
 
 3. **State Synchronization**: The app's state wasn't automatically updating when new completions were uploaded, creating a disconnect between backend data and frontend display.
@@ -27,7 +27,7 @@
 
 ### Primary Fix: Upload Success Hook
 **File**: `src/hooks/useUpload.ts`
-**Change**: Modified `createOutputDatasetMutation.onSuccess` callback:
+**Change**: Modified `createCompletionDatasetMutation.onSuccess` callback:
 
 ```typescript
 // Before (insufficient)
@@ -39,14 +39,14 @@ onSuccess: () => {
 onSuccess: () => {
   // Invalidate and refetch relevant queries after output upload
   queryClient.invalidateQueries({ queryKey: ['datasets'] });
-  queryClient.invalidateQueries({ queryKey: ['all-outputs'] });
-  queryClient.refetchQueries({ queryKey: ['all-outputs'] });
+  queryClient.invalidateQueries({ queryKey: ['all-completions'] });
+  queryClient.refetchQueries({ queryKey: ['all-completions'] });
 }
 ```
 
 **Explanation**: Now when completion uploads succeed, React Query immediately:
-1. Invalidates both dataset and output dataset caches
-2. Forces a refetch of output datasets
+1. Invalidates both dataset and completion dataset caches
+2. Forces a refetch of completion datasets
 3. Updates the UI automatically
 
 ### Supporting Changes
@@ -61,14 +61,14 @@ onSuccess: () => {
 #### App-Level Fallback
 **File**: `src/App.tsx` 
 **Changes**:
-- Added `useEffect` to refetch outputs when datasets are first loaded (handles page refreshes)
+- Added `useEffect` to refetch completions when datasets are first loaded (handles page refreshes)
 - Simplified to minimal logging for production use
 
 ## Terminology Improvements
 
 **UI Language Updates**: Changed confusing technical terms to user-friendly AI/ML terminology:
 - "Datasets" → "Prompts" 
-- "Output Datasets" → "Completions"
+- "Completion Datasets" → "Completions"
 - Updated throughout the app for clarity
 
 ## Verification & Testing
@@ -98,7 +98,7 @@ onSuccess: () => {
 - ✅ **Automatic updates**: Completion count updates immediately after upload
 - ✅ **Seamless workflow**: Users can upload → create comparison without manual steps  
 - ✅ **Reliable state**: UI always reflects actual backend data
-- ✅ **Better UX**: Clear terminology (Prompts/Completions vs Datasets/Output Datasets)
+- ✅ **Better UX**: Clear terminology (Prompts/Completions vs Datasets/Completion Datasets)
 
 ## Prevention Strategy
 

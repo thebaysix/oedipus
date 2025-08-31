@@ -8,8 +8,8 @@ interface DatasetPreviewProps {
   file: UploadedFile;
   onRemove: (fileId: string) => void;
   onTypeChange: (fileId: string, type: 'input' | 'output') => void;
-  onUpload: (fileId: string, inputDatasetId?: string) => void;
-  inputDatasets?: Array<{ id: string; name: string }>;
+  onUpload: (fileId: string, promptDatasetId?: string) => void;
+  promptDatasets?: Array<{ id: string; name: string }>;
   disabled?: boolean;
 }
 
@@ -18,7 +18,7 @@ export const DatasetPreview: React.FC<DatasetPreviewProps> = ({
   onRemove,
   onTypeChange,
   onUpload,
-  inputDatasets = [],
+  promptDatasets = [],
   disabled = false
 }) => {
   const getStatusIcon = () => {
@@ -48,13 +48,13 @@ export const DatasetPreview: React.FC<DatasetPreviewProps> = ({
   };
 
   const canUpload = file.status === 'pending' && !file.error;
-  const needsInputDataset = file.type === 'output' && inputDatasets.length > 0;
+  const needsPromptDataset = file.type === 'output' && promptDatasets.length > 0;
 
   const handleUpload = () => {
-    if (needsInputDataset) {
-      // For now, use the first available input dataset
+    if (needsPromptDataset) {
+      // For now, use the first available prompt dataset
       // In a full implementation, you'd want a selection UI
-      onUpload(file.id, inputDatasets[0]?.id);
+      onUpload(file.id, promptDatasets[0]?.id);
     } else {
       onUpload(file.id);
     }
@@ -98,7 +98,7 @@ export const DatasetPreview: React.FC<DatasetPreviewProps> = ({
             )}
           >
             <Database className="w-3 h-3 inline mr-1" />
-            Input Dataset
+            Prompt Dataset
           </button>
           <button
             onClick={() => onTypeChange(file.id, 'output')}
@@ -112,7 +112,7 @@ export const DatasetPreview: React.FC<DatasetPreviewProps> = ({
             )}
           >
             <FileOutput className="w-3 h-3 inline mr-1" />
-            Output Dataset
+            Completion Dataset
           </button>
         </div>
       </div>
@@ -165,7 +165,7 @@ export const DatasetPreview: React.FC<DatasetPreviewProps> = ({
         {canUpload && (
           <button
             onClick={handleUpload}
-            disabled={disabled || (needsInputDataset && inputDatasets.length === 0)}
+            disabled={disabled || (needsPromptDataset && promptDatasets.length === 0)}
             className={clsx(
               'px-3 py-1 rounded-md text-xs font-medium transition-colors',
               'bg-primary-500 text-white hover:bg-primary-600',

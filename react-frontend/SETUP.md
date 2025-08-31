@@ -79,8 +79,8 @@ The React app connects to the Oedipus FastAPI backend at `http://localhost:8000`
 
 **Required Backend Endpoints**:
 - `GET /api/v1/datasets/` - List datasets
-- `POST /api/v1/datasets/` - Upload input dataset
-- `POST /api/v1/datasets/{id}/outputs` - Upload output dataset
+- `POST /api/v1/datasets/` - Upload prompt dataset
+- `POST /api/v1/datasets/{id}/completions` - Upload completion dataset
 - `POST /api/v1/comparisons/create` - Create comparison analysis
 - `GET /api/v1/comparisons/{id}` - Get comparison results
 
@@ -116,7 +116,7 @@ react-frontend/
 
 ## Usage Workflow
 
-1. **Upload Data**: Drag and drop CSV files (input + output datasets)
+1. **Upload Data**: Drag and drop CSV files (prompt + completion datasets)
 2. **Review & Validate**: Check data preview and fix any issues
 3. **Create Comparison**: Configure comparative analysis
 4. **Explore Results**: View statistics, insights, and visualizations
@@ -124,14 +124,14 @@ react-frontend/
 
 ## CSV Data Format
 
-### Input Dataset
+### Prompt Dataset
 ```csv
 input_id,input_text,category
 001,What is machine learning?,technical
 002,How to bake a cake?,lifestyle
 ```
 
-### Output Dataset
+### Completion Dataset
 ```csv
 input_id,output_text,model_version,timestamp
 001,Machine learning is...,v1.0,2024-01-01
@@ -139,8 +139,8 @@ input_id,output_text,model_version,timestamp
 ```
 
 **Required Columns**:
-- Input Dataset: `input_id`, `input_text`
-- Output Dataset: `input_id`, `output_text`
+- Prompt Dataset: `input_id`, `input_text`
+- Completion Dataset: `input_id`, `output_text`
 
 ## Troubleshooting
 

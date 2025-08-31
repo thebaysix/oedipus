@@ -4,10 +4,10 @@ from typing import List, Dict, Any
 from collections import Counter
 
 
-def calculate_character_metrics(outputs: Dict[str, List[str]]) -> Dict[str, Any]:
-    """Calculate character-based metrics for outputs."""
+def calculate_character_metrics(completions: Dict[str, List[str]]) -> Dict[str, Any]:
+    """Calculate character-based metrics for completions."""
     all_outputs = []
-    for output_list in outputs.values():
+    for output_list in completions.values():
         all_outputs.extend(output_list)
     
     if not all_outputs:
@@ -45,16 +45,16 @@ def calculate_character_metrics(outputs: Dict[str, List[str]]) -> Dict[str, Any]
     }
 
 
-def calculate_token_metrics(outputs: Dict[str, List[str]]) -> Dict[str, Any]:
+def calculate_token_metrics(completions: Dict[str, List[str]]) -> Dict[str, Any]:
     """Calculate token-based metrics using tiktoken."""
     try:
         encoding = tiktoken.get_encoding("cl100k_base")  # GPT-4 encoding
     except Exception:
         # Fallback to simple word counting if tiktoken fails
-        return calculate_word_metrics(outputs)
+        return calculate_word_metrics(completions)
     
     all_outputs = []
-    for output_list in outputs.values():
+    for output_list in completions.values():
         all_outputs.extend(output_list)
     
     if not all_outputs:
@@ -99,10 +99,10 @@ def calculate_token_metrics(outputs: Dict[str, List[str]]) -> Dict[str, Any]:
     }
 
 
-def calculate_word_metrics(outputs: Dict[str, List[str]]) -> Dict[str, Any]:
+def calculate_word_metrics(completions: Dict[str, List[str]]) -> Dict[str, Any]:
     """Calculate word-based metrics as fallback."""
     all_outputs = []
-    for output_list in outputs.values():
+    for output_list in completions.values():
         all_outputs.extend(output_list)
     
     if not all_outputs:

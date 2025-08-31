@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from typing import List, Dict, Any
 import uuid
 from ..models.dataset import Dataset
-from ..models.output import OutputDataset
+from ..models.completion import CompletionDataset
 from ..models.comparison import Comparison
 from ..schemas.comparison import ComparisonCreate
 
@@ -17,28 +17,28 @@ class ComparisonService:
         if not dataset:
             raise ValueError(f"Dataset {payload.dataset_id} not found")
 
-        # Validate output datasets
-        outputs: List[OutputDataset] = (
-            self.db.query(OutputDataset)
-            .filter(OutputDataset.id.in_(payload.output_dataset_ids))
+        # Validate completion datasets
+        completions: List[CompletionDataset] = (
+            self.db.query(CompletionDataset)
+            .filter(CompletionDataset.id.in_(payload.completion_dataset_ids))
             .all()
         )
-        if len(outputs) != len(set(payload.output_dataset_ids)):
-            found_ids = {str(o.id) for o in outputs}
-            missing = [str(i) for i in payload.output_dataset_ids if str(i) not in found_ids]
-            raise ValueError(f"Output datasets not found: {missing}")
+        if len(completions) != len(set(payload.completion_dataset_ids)):
+            found_ids = {str(o.id) for o in completions}
+            missing = [str(i) for i in payload.completion_dataset_ids if str(i) not in found_ids]
+            raise ValueError(f"Completion datasets not found: {missing}")
 
-        # Ensure all outputs belong to the same input dataset
-        for o in outputs:
+        # Ensure all completions belong to the same prompt dataset
+        for o in completions:
             if o.dataset_id != payload.dataset_id:
-                raise ValueError("All output datasets must belong to the specified dataset")
+                raise ValueError("All completion datasets must belong to the specified dataset")
 
         # Alignment result per Feature 1 spec
-        alignment_result = self._compute_alignment_result(dataset.inputs, outputs)
+        alignment_result = self._compute_alignment_result(dataset.prompts, completions)
 
         comp = Comparison(
             name=payload.name,
-            datasets=[str(payload.dataset_id)] + [str(i) for i in payload.output_dataset_ids],
+            datasets=[str(payload.dataset_id)] + [str(i) for i in payload.completion_dataset_ids],
             alignment_key=payload.alignment_key,
             comparison_config=payload.comparison_config or {},
             statistical_results={"alignment": alignment_result},
@@ -70,27 +70,27 @@ class ComparisonService:
         self.db.commit()
         return True
 
-    def _compute_alignment_result(self, inputs: Dict[str, str], outputs: List[OutputDataset]) -> Dict[str, Any]:
-        input_keys = set(inputs.keys())
+    def _compute_alignment_result(self, prompts: Dict[str, str], completions: List[CompletionDataset]) -> Dict[str, Any]:
+        input_keys = set(prompts.keys())
         matched_intersection = input_keys.copy()
 
-        # Build quick maps for outputs by dataset
+        # Build quick maps for completions by dataset
         outputs_by_dataset: Dict[str, Dict[str, List[str]]] = {}
         dataset_name_by_id: Dict[str, str] = {}
-        for o in outputs:
+        for o in completions:
             ds_id = str(o.id)
-            outputs_by_dataset[ds_id] = o.outputs or {}
+            outputs_by_dataset[ds_id] = o.completions or {}
             dataset_name_by_id[ds_id] = o.name
-            matched_intersection &= set((o.outputs or {}).keys())
+            matched_intersection &= set((o.completions or {}).keys())
 
         total_inputs = len(input_keys)
         matched_inputs = len(matched_intersection)
         coverage = (matched_inputs / total_inputs * 100.0) if total_inputs else 0.0
 
-        # Unmatched inputs: those missing in any selected dataset (union of differences)
+        # Unmatched prompts: those missing in any selected dataset (union of differences)
         unmatched_union = set()
-        for o in outputs:
-            keys = set((o.outputs or {}).keys())
+        for o in completions:
+            keys = set((o.completions or {}).keys())
             unmatched_union |= (input_keys - keys)
 
         # Construct aligned rows for matched intersection (cap to 200 rows to keep payload small)
@@ -104,8 +104,8 @@ class ComparisonService:
                 row_meta[name] = {}
             aligned_rows.append({
                 "inputId": input_id,
-                "inputText": inputs.get(input_id, ""),
-                "outputs": row_outputs,
+                "inputText": prompts.get(input_id, ""),
+                "completions": row_outputs,
                 "metadata": row_meta,
             })
 

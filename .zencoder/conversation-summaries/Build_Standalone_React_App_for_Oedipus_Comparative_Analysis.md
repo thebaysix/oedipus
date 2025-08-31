@@ -1,16 +1,16 @@
 ---
 timestamp: 2025-08-28T04:57:32.918622
 initial_query: We've reached a good checkpoint with the demo version of this tool.
-As a next step, I'd like you to build a **standalone React app** that covers the Comparative Analysis feature, which is the key differentiating feature of Oedipus. We already have a demo version of this in the streamlit_app, but that is for demo purposes only. Now, we want a more professional React/TS implementation with a **simple and snappy** single page where one can upload (drag and drop) input and output datasets and see the statistical metrics and explore dataset differences and gain insights.
+As a next step, I'd like you to build a **standalone React app** that covers the Comparative Analysis feature, which is the key differentiating feature of Oedipus. We already have a demo version of this in the streamlit_app, but that is for demo purposes only. Now, we want a more professional React/TS implementation with a **simple and snappy** single page where one can upload (drag and drop) prompt and completion datasets and see the statistical metrics and explore dataset differences and gain insights.
 Note that much of this implementation already exists in streamlit, and the backend should remain the same, the key ask here is to make the new standalone snappy React frontend app (moving away from streamilt) that focuses on nailing this feature alone.
 Here is the full feature spec:
 # Oedipus Comparative Analysis Feature
 *Design & Engineering Specification*
 ## Overview
-The Comparative Analysis feature transforms Oedipus from an analytics tool into an essential workflow component for AI model evaluation. Instead of analyzing datasets in isolation, this feature enables developers to directly compare model outputs, detect performance regressions, and make data-driven decisions about model selection and prompt engineering.
+The Comparative Analysis feature transforms Oedipus from an analytics tool into an essential workflow component for AI model evaluation. Instead of analyzing datasets in isolation, this feature enables developers to directly compare model completions, detect performance regressions, and make data-driven decisions about model selection and prompt engineering.
 This standalone React application addresses the most critical gap in the current MVP: the lack of actionable comparative insights that developers need to make deployment decisions.
 ## Problem Statement
-**Current State**: Developers manually compare model outputs by writing custom scripts, eyeballing CSV files, or building one-off analysis notebooks. This process is time-consuming, error-prone, and doesn't provide statistical rigor.
+**Current State**: Developers manually compare model completions by writing custom scripts, eyeballing CSV files, or building one-off analysis notebooks. This process is time-consuming, error-prone, and doesn't provide statistical rigor.
 **Target State**: Developers upload multiple datasets, receive automated statistical comparisons with confidence intervals, and get actionable insights about which models perform better and why.
 **Success Criteria**: 
 - Time from upload to actionable insight < 2 minutes
@@ -21,7 +21,7 @@ This standalone React application addresses the most critical gap in the current
 **"Model Performance Detective"** - Answer specific questions developers ask daily:
 - "Which model should I deploy?"
 - "Did my latest prompt engineering actually improve results?"
-- "What inputs consistently cause problems across models?"
+- "What prompts consistently cause problems across models?"
 - "Is the performance difference statistically significant?"
 ## Technical Architecture
 ### Frontend: React Application
@@ -140,7 +140,7 @@ interface AlignmentResult {
 interface AlignedRow {
   inputId: string;
   inputText: string;
-  outputs: {
+  completions: {
     [datasetName: string]: string[] | null;
   };
   metadata: {
@@ -149,9 +149,9 @@ interface AlignedRow {
 }
 ```
 **Validation Rules**:
-- Minimum 10 aligned inputs for statistical significance
+- Minimum 10 aligned prompts for statistical significance
 - Maximum 50,000 rows per dataset (performance constraint)
-- Required fields: input identifier and output content
+- Required fields: prompt identifier and completion content
 - Optional fields: model version, timestamp, custom scores
 ### 2. Side-by-Side Comparison Interface
 **Interactive Data Table**:
@@ -172,16 +172,16 @@ total_messages: 82
 
 ## Initial Query
 We've reached a good checkpoint with the demo version of this tool.
-As a next step, I'd like you to build a **standalone React app** that covers the Comparative Analysis feature, which is the key differentiating feature of Oedipus. We already have a demo version of this in the streamlit_app, but that is for demo purposes only. Now, we want a more professional React/TS implementation with a **simple and snappy** single page where one can upload (drag and drop) input and output datasets and see the statistical metrics and explore dataset differences and gain insights.
+As a next step, I'd like you to build a **standalone React app** that covers the Comparative Analysis feature, which is the key differentiating feature of Oedipus. We already have a demo version of this in the streamlit_app, but that is for demo purposes only. Now, we want a more professional React/TS implementation with a **simple and snappy** single page where one can upload (drag and drop) prompt and completion datasets and see the statistical metrics and explore dataset differences and gain insights.
 Note that much of this implementation already exists in streamlit, and the backend should remain the same, the key ask here is to make the new standalone snappy React frontend app (moving away from streamilt) that focuses on nailing this feature alone.
 Here is the full feature spec:
 # Oedipus Comparative Analysis Feature
 *Design & Engineering Specification*
 ## Overview
-The Comparative Analysis feature transforms Oedipus from an analytics tool into an essential workflow component for AI model evaluation. Instead of analyzing datasets in isolation, this feature enables developers to directly compare model outputs, detect performance regressions, and make data-driven decisions about model selection and prompt engineering.
+The Comparative Analysis feature transforms Oedipus from an analytics tool into an essential workflow component for AI model evaluation. Instead of analyzing datasets in isolation, this feature enables developers to directly compare model completions, detect performance regressions, and make data-driven decisions about model selection and prompt engineering.
 This standalone React application addresses the most critical gap in the current MVP: the lack of actionable comparative insights that developers need to make deployment decisions.
 ## Problem Statement
-**Current State**: Developers manually compare model outputs by writing custom scripts, eyeballing CSV files, or building one-off analysis notebooks. This process is time-consuming, error-prone, and doesn't provide statistical rigor.
+**Current State**: Developers manually compare model completions by writing custom scripts, eyeballing CSV files, or building one-off analysis notebooks. This process is time-consuming, error-prone, and doesn't provide statistical rigor.
 **Target State**: Developers upload multiple datasets, receive automated statistical comparisons with confidence intervals, and get actionable insights about which models perform better and why.
 **Success Criteria**: 
 - Time from upload to actionable insight < 2 minutes
@@ -192,7 +192,7 @@ This standalone React application addresses the most critical gap in the current
 **"Model Performance Detective"** - Answer specific questions developers ask daily:
 - "Which model should I deploy?"
 - "Did my latest prompt engineering actually improve results?"
-- "What inputs consistently cause problems across models?"
+- "What prompts consistently cause problems across models?"
 - "Is the performance difference statistically significant?"
 ## Technical Architecture
 ### Frontend: React Application
@@ -311,7 +311,7 @@ interface AlignmentResult {
 interface AlignedRow {
   inputId: string;
   inputText: string;
-  outputs: {
+  completions: {
     [datasetName: string]: string[] | null;
   };
   metadata: {
@@ -320,9 +320,9 @@ interface AlignedRow {
 }
 ```
 **Validation Rules**:
-- Minimum 10 aligned inputs for statistical significance
+- Minimum 10 aligned prompts for statistical significance
 - Maximum 50,000 rows per dataset (performance constraint)
-- Required fields: input identifier and output content
+- Required fields: prompt identifier and completion content
 - Optional fields: model version, timestamp, custom scores
 ### 2. Side-by-Side Comparison Interface
 **Interactive Data Table**:
@@ -340,13 +340,13 @@ interface AlignedRow {
 working
 
 ## Complete Conversation Summary
-The user requested building a standalone React/TypeScript application to replace the existing Streamlit demo for Oedipus's Comparative Analysis feature. The goal was to create a professional, snappy single-page application that allows users to upload datasets via drag-and-drop, perform statistical comparisons between AI model outputs, and explore insights through interactive visualizations.
+The user requested building a standalone React/TypeScript application to replace the existing Streamlit demo for Oedipus's Comparative Analysis feature. The goal was to create a professional, snappy single-page application that allows users to upload datasets via drag-and-drop, perform statistical comparisons between AI model completions, and explore insights through interactive visualizations.
 
 I began by exploring the existing codebase to understand the current Streamlit implementation, examining the comparison component, API routes, schemas, and database models. The backend infrastructure was already in place with FastAPI endpoints for dataset management, comparison creation, and result retrieval.
 
 I then created a complete React application from scratch using modern development practices. The tech stack includes React 18 with TypeScript, Vite for build tooling, TanStack Query for server state management, Zustand for client state, Recharts for visualizations, and Tailwind CSS for styling. The application follows a clean component architecture organized into logical folders: DatasetUpload, ComparisonTable, MetricsComparison, and StatisticalTests.
 
-The application implements a three-step wizard workflow: 1) Upload datasets with drag-and-drop functionality and real-time validation, 2) Create comparisons by selecting input and output datasets, and 3) View comprehensive results including statistical summaries, interactive charts, and aligned data tables. Key features include automatic file type detection, CSV parsing with Papa Parse, statistical significance testing, effect size calculations, and confidence intervals.
+The application implements a three-step wizard workflow: 1) Upload datasets with drag-and-drop functionality and real-time validation, 2) Create comparisons by selecting prompt and completion datasets, and 3) View comprehensive results including statistical summaries, interactive charts, and aligned data tables. Key features include automatic file type detection, CSV parsing with Papa Parse, statistical significance testing, effect size calculations, and confidence intervals.
 
 I created comprehensive TypeScript types to ensure type safety across the application, custom hooks for upload and comparison management, utility functions for API communication and data processing, and reusable React components with proper state management. The main App component orchestrates the entire user flow with a visual step indicator and conditional rendering based on the current step.
 

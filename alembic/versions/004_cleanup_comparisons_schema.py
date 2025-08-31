@@ -30,7 +30,7 @@ def upgrade() -> None:
     conn.execute(sa.text("""
         ALTER TABLE IF EXISTS comparisons
         DROP COLUMN IF EXISTS alignment_stats CASCADE,
-        DROP COLUMN IF EXISTS output_dataset_ids CASCADE,
+        DROP COLUMN IF EXISTS completion_dataset_ids CASCADE,
         DROP COLUMN IF EXISTS dataset_id CASCADE;
     """))
 
@@ -41,6 +41,6 @@ def downgrade() -> None:
     conn.execute(sa.text("""
         ALTER TABLE IF EXISTS comparisons
         ADD COLUMN IF NOT EXISTS dataset_id UUID,
-        ADD COLUMN IF NOT EXISTS output_dataset_ids JSON,
+        ADD COLUMN IF NOT EXISTS completion_dataset_ids JSON,
         ADD COLUMN IF NOT EXISTS alignment_stats JSON;
     """))

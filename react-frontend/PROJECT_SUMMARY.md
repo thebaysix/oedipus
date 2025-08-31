@@ -2,14 +2,14 @@
 
 ## 🎯 Overview
 
-The Oedipus React frontend is a professional, standalone web application for comparative analysis of AI model outputs. Built with React 18 and TypeScript, it provides a **simple and snappy** single-page interface where users can upload datasets via drag-and-drop, perform statistical comparisons, and gain actionable insights for AI model evaluation.
+The Oedipus React frontend is a professional, standalone web application for comparative analysis of AI model completions. Built with React 18 and TypeScript, it provides a **simple and snappy** single-page interface where users can upload datasets via drag-and-drop, perform statistical comparisons, and gain actionable insights for AI model evaluation.
 
 ## 🚀 Key Features Implemented
 
 ### 1. **Drag-and-Drop Dataset Upload**
 - Multi-file upload support with real-time validation
 - Automatic CSV parsing and schema detection
-- Column mapping for input/output dataset types
+- Column mapping for input/completion dataset types
 - Rich file preview with error handling
 - File size and row count validation
 
@@ -111,7 +111,7 @@ npm run dev              # Start development server
 1. **📁 Upload Data** 
    - Drag CSV files into upload area
    - Real-time validation and preview
-   - Automatic type detection (input vs output)
+   - Automatic type detection (prompt vs completion)
 
 2. **⚖️ Create Comparison**
    - Select datasets to compare
@@ -134,28 +134,28 @@ npm run dev              # Start development server
 ### **Required API Endpoints**
 ```
 GET    /api/v1/datasets/              # List datasets
-POST   /api/v1/datasets/              # Upload input dataset  
-POST   /api/v1/datasets/{id}/outputs  # Upload output dataset
+POST   /api/v1/datasets/              # Upload prompt dataset  
+POST   /api/v1/datasets/{id}/completions  # Upload completion dataset
 POST   /api/v1/comparisons/create     # Create comparison
 GET    /api/v1/comparisons/{id}       # Get results
 ```
 
 ### **Data Models**
 - **Dataset**: Input data with metadata
-- **OutputDataset**: Model outputs linked to inputs
+- **CompletionDataset**: Model completions linked to prompts
 - **Comparison**: Analysis configuration and results
 - **StatisticalMetric**: Computed comparison metrics
 
 ## 📋 CSV Data Format
 
-### **Input Dataset**
+### **Prompt Dataset**
 ```csv
 input_id,input_text,category
 001,"What is machine learning?",technical
 002,"How to bake a cake?",lifestyle
 ```
 
-### **Output Dataset**
+### **Completion Dataset**
 ```csv
 input_id,output_text,model_version
 001,"Machine learning is a branch of...",v1.0

@@ -1,6 +1,6 @@
 # Oedipus
 
-Observation → grounding in monitoring/logging model outputs.
+Observation → grounding in monitoring/logging model completions.
 Evaluation → structured scoring of model behaviors.
 Diagnostics → pinpointing failure modes, systematic weaknesses.
 Information-theoretic → ties directly to your entropy/empowerment/information gain metrics.
@@ -88,15 +88,15 @@ python scripts/start_frontend.py
 
 ## Usage
 
-### 1. Upload Input Dataset
+### 1. Upload Prompt Dataset
 - Navigate to "Upload Data" page
 - Create JSON mapping: `{"input_id": "prompt_text"}`
 - Use sample data or upload your own
 
-### 2. Upload Output Dataset
-- Select your input dataset
+### 2. Upload Completion Dataset
+- Select your prompt dataset
 - Create JSON mapping: `{"input_id": ["output1", "output2"]}`
-- Validate against input dataset
+- Validate against prompt dataset
 
 ### 3. Run Analysis
 - Go to "Analysis" page
@@ -108,8 +108,8 @@ python scripts/start_frontend.py
 
 ### Information-Theoretic Metrics
 - **Input Entropy**: Diversity of input prompts
-- **Response Entropy**: Diversity of outputs given inputs
-- **Information Gain**: Mutual information between inputs/outputs
+- **Response Entropy**: Diversity of completions given prompts
+- **Information Gain**: Mutual information between prompts/completions
 - **Empowerment**: Model decision influence on output diversity
 
 ### Visualizations
@@ -131,8 +131,8 @@ POST /api/v1/datasets                    # Create dataset
 GET  /api/v1/datasets                    # List datasets
 GET  /api/v1/datasets/{id}               # Get dataset
 
-POST /api/v1/datasets/{id}/outputs       # Create output dataset
-GET  /api/v1/datasets/{id}/outputs       # List output datasets
+POST /api/v1/datasets/{id}/completions       # Create completion dataset
+GET  /api/v1/datasets/{id}/completions       # List completion datasets
 
 POST /api/v1/analysis/run                # Start analysis job
 GET  /api/v1/analysis/{job_id}/status    # Check job status
@@ -156,7 +156,7 @@ Frontend (Streamlit) → API (FastAPI) → Database (PostgreSQL)
 
 ## Data Format
 
-### Input Dataset
+### Prompt Dataset
 ```json
 {
     "input_1": "What is the capital of France?",
@@ -165,7 +165,7 @@ Frontend (Streamlit) → API (FastAPI) → Database (PostgreSQL)
 }
 ```
 
-### Output Dataset
+### Completion Dataset
 ```json
 {
     "input_1": [
@@ -252,8 +252,8 @@ docker compose logs [service_name]
 ## Performance
 
 ### Tested Limits
-- ✅ 1,000 input/output pairs: < 5 minutes
-- ✅ 10,000 inputs with multiple outputs: < 15 minutes
+- ✅ 1,000 prompt/completion pairs: < 5 minutes
+- ✅ 10,000 prompts with multiple completions: < 15 minutes
 - ✅ Complex analysis with all metrics: < 2 minutes
 
 ### Optimization Tips

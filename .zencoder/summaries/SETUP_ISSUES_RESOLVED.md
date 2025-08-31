@@ -44,7 +44,7 @@ All dependency installation issues have been successfully resolved. The setup sc
 ### 6. ✅ SQLAlchemy Reserved Attribute Names
 **Problem**: `metadata` column name conflicts with SQLAlchemy's reserved `metadata` attribute.
 
-**Solution**: Renamed `metadata` columns to `user_metadata` in Dataset and OutputDataset models
+**Solution**: Renamed `metadata` columns to `user_metadata` in Dataset and CompletionDataset models
 
 ### 7. ✅ Enhanced Setup Script
 **Improvements**:

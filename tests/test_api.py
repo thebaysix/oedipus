@@ -44,7 +44,7 @@ def test_create_dataset():
     """Test creating a dataset."""
     dataset_data = {
         "name": "Test Dataset",
-        "inputs": {
+        "prompts": {
             "input_1": "What is AI?",
             "input_2": "Explain machine learning"
         },
@@ -56,7 +56,7 @@ def test_create_dataset():
     
     data = response.json()
     assert data["name"] == "Test Dataset"
-    assert len(data["inputs"]) == 2
+    assert len(data["prompts"]) == 2
     assert "id" in data
 
 def test_get_datasets():
@@ -67,12 +67,12 @@ def test_get_datasets():
     data = response.json()
     assert isinstance(data, list)
 
-def test_create_output_dataset():
-    """Test creating an output dataset."""
-    # First create an input dataset
+def test_create_completion_dataset():
+    """Test creating an completion dataset."""
+    # First create an prompt dataset
     dataset_data = {
         "name": "Test Dataset for Outputs",
-        "inputs": {
+        "prompts": {
             "input_1": "What is AI?",
             "input_2": "Explain ML"
         }
@@ -82,16 +82,16 @@ def test_create_output_dataset():
     assert dataset_response.status_code == 201
     dataset_id = dataset_response.json()["id"]
     
-    # Now create output dataset
+    # Now create completion dataset
     output_data = {
         "name": "Test Outputs",
-        "outputs": {
+        "completions": {
             "input_1": ["AI is artificial intelligence", "AI mimics human intelligence"],
             "input_2": ["ML is machine learning"]
         }
     }
     
-    response = client.post(f"/api/v1/datasets/{dataset_id}/outputs", json=output_data)
+    response = client.post(f"/api/v1/datasets/{dataset_id}/completions", json=output_data)
     assert response.status_code == 201
     
     data = response.json()
@@ -100,10 +100,10 @@ def test_create_output_dataset():
 
 def test_analysis_job_creation():
     """Test creating an analysis job."""
-    # Create dataset and output dataset first
+    # Create dataset and completion dataset first
     dataset_data = {
         "name": "Analysis Test Dataset",
-        "inputs": {"input_1": "Test input"}
+        "prompts": {"input_1": "Test prompt"}
     }
     
     dataset_response = client.post("/api/v1/datasets/", json=dataset_data)
@@ -111,14 +111,14 @@ def test_analysis_job_creation():
     
     output_data = {
         "name": "Analysis Test Outputs",
-        "outputs": {"input_1": ["Test output 1", "Test output 2"]}
+        "completions": {"input_1": ["Test output 1", "Test output 2"]}
     }
     
-    output_response = client.post(f"/api/v1/datasets/{dataset_id}/outputs", json=output_data)
+    output_response = client.post(f"/api/v1/datasets/{dataset_id}/completions", json=output_data)
     output_id = output_response.json()["id"]
     
     # Create analysis job
-    job_data = {"output_dataset_id": output_id}
+    job_data = {"completion_dataset_id": output_id}
     response = client.post("/api/v1/analysis/run", json=job_data)
     
     assert response.status_code == 201

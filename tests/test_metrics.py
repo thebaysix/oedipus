@@ -5,64 +5,64 @@ from app.services.metrics.empowerment import calculate_empowerment, calculate_ou
 from app.services.metrics.basic_metrics import calculate_character_metrics, calculate_token_metrics
 
 def test_input_entropy():
-    """Test input entropy calculation."""
-    inputs = {
+    """Test prompt entropy calculation."""
+    prompts = {
         "input_1": "What is AI?",
         "input_2": "What is AI?",  # Duplicate
         "input_3": "What is ML?"
     }
     
-    entropy = calculate_input_entropy(inputs)
+    entropy = calculate_input_entropy(prompts)
     assert entropy > 0
     assert isinstance(entropy, float)
 
 def test_response_entropy():
     """Test response entropy calculation."""
-    inputs = {
+    prompts = {
         "input_1": "What is AI?",
         "input_2": "What is ML?"
     }
     
-    outputs = {
+    completions = {
         "input_1": ["AI is artificial intelligence", "AI mimics human intelligence"],
         "input_2": ["ML is machine learning"]
     }
     
-    entropy = calculate_response_entropy(inputs, outputs)
+    entropy = calculate_response_entropy(prompts, completions)
     assert entropy >= 0
     assert isinstance(entropy, float)
 
 def test_information_gain():
     """Test information gain calculation."""
-    inputs = {
+    prompts = {
         "input_1": "What is AI?",
         "input_2": "What is ML?"
     }
     
-    outputs = {
+    completions = {
         "input_1": ["AI is artificial intelligence"],
         "input_2": ["ML is machine learning"]
     }
     
-    info_gain = calculate_information_gain(inputs, outputs)
+    info_gain = calculate_information_gain(prompts, completions)
     assert info_gain >= 0
     assert isinstance(info_gain, float)
 
 def test_mutual_information():
     """Test mutual information calculation."""
-    inputs = {
+    prompts = {
         "input_1": "What is AI?",
         "input_2": "What is ML?",
         "input_3": "What is DL?"
     }
     
-    outputs = {
+    completions = {
         "input_1": ["AI is artificial intelligence", "AI mimics human intelligence"],
         "input_2": ["ML is machine learning"],
         "input_3": ["DL is deep learning", "DL uses neural networks"]
     }
     
-    mi_metrics = calculate_mutual_information(inputs, outputs)
+    mi_metrics = calculate_mutual_information(prompts, completions)
     
     assert "input_entropy" in mi_metrics
     assert "response_entropy" in mi_metrics
@@ -75,35 +75,35 @@ def test_mutual_information():
 
 def test_empowerment():
     """Test empowerment calculation."""
-    inputs = {
+    prompts = {
         "input_1": "What is AI?",
         "input_2": "What is ML?"
     }
     
-    outputs = {
+    completions = {
         "input_1": ["Response 1", "Response 2", "Response 3"],
         "input_2": ["Response A"]
     }
     
-    empowerment = calculate_empowerment(inputs, outputs)
+    empowerment = calculate_empowerment(prompts, completions)
     assert empowerment >= 0
     assert isinstance(empowerment, float)
 
 def test_output_diversity_metrics():
     """Test output diversity metrics."""
-    inputs = {
+    prompts = {
         "input_1": "What is AI?",
         "input_2": "What is ML?",
         "input_3": "What is DL?"
     }
     
-    outputs = {
+    completions = {
         "input_1": ["AI is artificial intelligence", "AI mimics human intelligence"],
         "input_2": ["ML is machine learning"],
         "input_3": ["DL is deep learning", "DL uses neural networks", "Deep learning is advanced ML"]
     }
     
-    diversity_metrics = calculate_output_diversity_metrics(inputs, outputs)
+    diversity_metrics = calculate_output_diversity_metrics(prompts, completions)
     
     expected_keys = [
         "empowerment",
@@ -119,12 +119,12 @@ def test_output_diversity_metrics():
 
 def test_character_metrics():
     """Test character metrics calculation."""
-    outputs = {
+    completions = {
         "input_1": ["Short", "Medium length text"],
         "input_2": ["Very long text that has many characters in it"]
     }
     
-    char_metrics = calculate_character_metrics(outputs)
+    char_metrics = calculate_character_metrics(completions)
     
     expected_keys = [
         "character_count_mean",
@@ -142,12 +142,12 @@ def test_character_metrics():
 
 def test_token_metrics():
     """Test token metrics calculation."""
-    outputs = {
+    completions = {
         "input_1": ["Hello world", "This is a longer sentence"],
         "input_2": ["Short"]
     }
     
-    token_metrics = calculate_token_metrics(outputs)
+    token_metrics = calculate_token_metrics(completions)
     
     # Should have either token metrics or word metrics (fallback)
     expected_keys = [
@@ -167,7 +167,7 @@ def test_token_metrics():
     assert has_token_metrics or has_word_metrics
 
 def test_empty_inputs():
-    """Test metrics with empty inputs."""
+    """Test metrics with empty prompts."""
     empty_inputs = {}
     empty_outputs = {}
     

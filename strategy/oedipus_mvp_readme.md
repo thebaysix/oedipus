@@ -3,9 +3,9 @@
 
 ## Overview
 
-Oedipus Phase 1 is a lightweight MVP focused on bulk upload analysis of AI model outputs. Users upload input datasets and corresponding output datasets, then receive comprehensive information-theoretic analysis to understand their model's behavior patterns.
+Oedipus Phase 1 is a lightweight MVP focused on bulk upload analysis of AI model completions. Users upload prompt datasets and corresponding completion datasets, then receive comprehensive information-theoretic analysis to understand their model's behavior patterns.
 
-**Core Value Proposition**: Bring your own data (inputs + outputs), get professional-grade analytics on model behavior without writing custom evaluation scripts.
+**Core Value Proposition**: Bring your own data (prompts + completions), get professional-grade analytics on model behavior without writing custom evaluation scripts.
 
 ## System Architecture
 
@@ -37,20 +37,20 @@ class Dataset(Base):
     name: str
     user_id: UUID
     created_at: datetime
-    inputs: Dict[str, str]  # mapping inputId -> input_string
+    prompts: Dict[str, str]  # mapping inputId -> input_string
     metadata: Dict  # user-defined metadata
 
-class OutputDataset(Base):
+class CompletionDataset(Base):
     id: UUID
     name: str
     dataset_id: UUID  # foreign key to Dataset
     created_at: datetime
-    outputs: Dict  # mapping (dataset_name, input_id) -> [output_strings]
+    completions: Dict  # mapping (dataset_name, input_id) -> [output_strings]
     metadata: Dict
 
 class AnalysisJob(Base):
     id: UUID
-    output_dataset_id: UUID
+    completion_dataset_id: UUID
     status: str  # pending/running/completed/failed
     results: Dict  # computed metrics
     created_at: datetime
@@ -66,8 +66,8 @@ POST /api/v1/datasets
 GET  /api/v1/datasets
 GET  /api/v1/datasets/{dataset_id}
 
-POST /api/v1/datasets/{dataset_id}/outputs
-GET  /api/v1/datasets/{dataset_id}/outputs
+POST /api/v1/datasets/{dataset_id}/completions
+GET  /api/v1/datasets/{dataset_id}/completions
 
 POST /api/v1/analysis/run
 GET  /api/v1/analysis/{job_id}/status
@@ -82,7 +82,7 @@ User Upload → Data Validation → Storage → Analysis Queue → Metrics Compu
 
 1. **Data Ingestion Layer**
    - JSON file upload and validation
-   - Schema verification for input/output mappings
+   - Schema verification for input/completion mappings
    - Data cleaning and preprocessing
 
 2. **Analysis Engine** 
@@ -98,30 +98,30 @@ User Upload → Data Validation → Storage → Analysis Queue → Metrics Compu
 ## Core Features - Phase 1
 
 ### 1. Dataset Management
-- **Input Dataset Creation**: Upload JSON mapping `{inputId: input_string}`
+- **Prompt Dataset Creation**: Upload JSON mapping `{inputId: input_string}`
 - **Custom Naming**: User-defined dataset names and metadata
-- **Dataset Versioning**: Track different versions of input datasets
+- **Dataset Versioning**: Track different versions of prompt datasets
 
 ### 2. Output Data Upload
 - **Multi-Output Support**: One-to-many input→output relationships
 - **Structured Format**: JSON mapping `{(dataset_name, input_id): [output_array]}`
-- **Validation**: Ensure output data matches existing input datasets
+- **Validation**: Ensure output data matches existing prompt datasets
 
 ### 3. Information-Theoretic Analysis
 
 **Implemented Metrics:**
 
-- **Input Entropy**: Measures distribution spread over inputs
+- **Input Entropy**: Measures distribution spread over prompts
   ```
   H(X) = -Σ p(x) log p(x)
   ```
 
-- **Response Entropy**: Entropy of model outputs given inputs
+- **Response Entropy**: Entropy of model completions given prompts
   ```
   H(Y|X) = -Σ p(x,y) log p(y|x)
   ```
 
-- **Information Gain**: Mutual information between inputs and outputs
+- **Information Gain**: Mutual information between prompts and completions
   ```
   I(X;Y) = H(X) - H(X|Y)
   ```
@@ -138,7 +138,7 @@ User Upload → Data Validation → Storage → Analysis Queue → Metrics Compu
 ### 4. Visualization Dashboard
 
 **Streamlit Interface:**
-- Upload forms for datasets and outputs
+- Upload forms for datasets and completions
 - Real-time analysis job status
 - Interactive metric visualizations
 - Data export functionality
@@ -151,7 +151,7 @@ oedipus-mvp/
 │   ├── api/
 │   │   ├── routes/
 │   │   │   ├── datasets.py
-│   │   │   ├── outputs.py
+│   │   │   ├── completions.py
 │   │   │   └── analysis.py
 │   │   └── main.py
 │   ├── core/
@@ -208,7 +208,7 @@ celery -A app.workers.analysis_worker worker --loglevel=info
 
 1. **Upload Validation**
    - JSON schema validation
-   - Input/output mapping verification
+   - Input/completion mapping verification
    - File size and format checks
 
 2. **Background Processing**
@@ -248,8 +248,8 @@ celery -A app.workers.analysis_worker worker --loglevel=info
 ## Success Metrics - Phase 1
 
 **Technical:**
-- Upload→Analysis→Results cycle < 5 minutes for 1000 input/output pairs
-- Support datasets up to 10,000 inputs with multiple outputs
+- Upload→Analysis→Results cycle < 5 minutes for 1000 input/completion pairs
+- Support datasets up to 10,000 prompts with multiple completions
 - 99% uptime for analysis processing
 
 **User Experience:**

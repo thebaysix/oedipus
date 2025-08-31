@@ -22,7 +22,7 @@ def upgrade() -> None:
         sa.Column('id', postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column('name', sa.String(), nullable=False),
         sa.Column('dataset_id', postgresql.UUID(as_uuid=True), nullable=False),
-        sa.Column('output_dataset_ids', sa.JSON(), nullable=False),
+        sa.Column('completion_dataset_ids', sa.JSON(), nullable=False),
         sa.Column('alignment_key', sa.String(), nullable=False),
         sa.Column('comparison_config', sa.JSON(), nullable=True),
         sa.Column('alignment_stats', sa.JSON(), nullable=True),

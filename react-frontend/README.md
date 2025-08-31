@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Oedipus React Frontend is a comprehensive comparative analysis platform built with React, TypeScript, and Tailwind CSS. It provides an intuitive interface for uploading datasets, creating comparisons, and analyzing AI model outputs with detailed statistical insights.
+The Oedipus React Frontend is a comprehensive comparative analysis platform built with React, TypeScript, and Tailwind CSS. It provides an intuitive interface for uploading datasets, creating comparisons, and analyzing AI model completions with detailed statistical insights.
 
 ## Architecture
 
@@ -34,10 +34,10 @@ Main App | Diagnostic | Simple Test | Debug Hooks
 - **Responsive layout** optimized for data analysis workflows
 
 **Functionality**:
-- Upload input datasets (CSV format with `input_id`, `input_text`)
-- Upload output datasets (CSV format with `input_id`, `output_text`)
+- Upload prompt datasets (CSV format with `input_id`, `input_text`)
+- Upload completion datasets (CSV format with `input_id`, `output_text`)
 - Data validation and preview before processing
-- Create comparative analyses between model outputs
+- Create comparative analyses between model completions
 - Interactive visualizations using Recharts
 - Statistical test results and significance analysis
 - Auto-generated insights based on data patterns
@@ -133,7 +133,7 @@ Main App | Diagnostic | Simple Test | Debug Hooks
 
 **Functionality**:
 - **useDatasets() Hook Analysis**: Real-time hook state inspection for prompt datasets
-- **useAllOutputDatasets() Hook Analysis**: Real-time hook state inspection for completion datasets
+- **useAllCompletionDatasets() Hook Analysis**: Real-time hook state inspection for completion datasets
 - **Loading State Monitoring**: Track async operation states
 - **Error State Debugging**: Detailed error information display
 - **Data Inspection**: Raw API response examination
@@ -233,8 +233,8 @@ The React app connects to the Oedipus FastAPI backend at `http://localhost:8000`
 ```
 GET  /health                          # System status
 GET  /api/v1/datasets/               # List datasets
-POST /api/v1/datasets/               # Upload input dataset
-POST /api/v1/datasets/{id}/outputs   # Upload output dataset
+POST /api/v1/datasets/               # Upload prompt dataset
+POST /api/v1/datasets/{id}/completions   # Upload completion dataset
 POST /api/v1/comparisons/create      # Create comparison
 GET  /api/v1/comparisons/{id}        # Get comparison results
 ```

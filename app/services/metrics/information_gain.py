@@ -4,19 +4,19 @@ from typing import List, Dict, Any
 from .entropy import calculate_input_entropy, calculate_response_entropy
 
 
-def calculate_information_gain(inputs: Dict[str, str], outputs: Dict[str, List[str]]) -> float:
+def calculate_information_gain(prompts: Dict[str, str], completions: Dict[str, List[str]]) -> float:
     """
-    Calculate mutual information between inputs and outputs.
+    Calculate mutual information between prompts and completions.
     I(X;Y) = H(Y) - H(Y|X)
     """
-    if not inputs or not outputs:
+    if not prompts or not completions:
         return 0.0
     
     # Calculate output entropy H(Y)
     all_outputs = []
-    for input_id in inputs.keys():
-        if input_id in outputs:
-            all_outputs.extend(outputs[input_id])
+    for input_id in prompts.keys():
+        if input_id in completions:
+            all_outputs.extend(completions[input_id])
     
     if not all_outputs:
         return 0.0
@@ -31,19 +31,19 @@ def calculate_information_gain(inputs: Dict[str, str], outputs: Dict[str, List[s
             output_entropy -= p * np.log2(p)
     
     # Calculate conditional entropy H(Y|X)
-    conditional_entropy = calculate_response_entropy(inputs, outputs)
+    conditional_entropy = calculate_response_entropy(prompts, completions)
     
     # Information gain = H(Y) - H(Y|X)
     return output_entropy - conditional_entropy
 
 
-def calculate_mutual_information(inputs: Dict[str, str], outputs: Dict[str, List[str]]) -> Dict[str, float]:
+def calculate_mutual_information(prompts: Dict[str, str], completions: Dict[str, List[str]]) -> Dict[str, float]:
     """
     Calculate various mutual information metrics.
     """
-    input_entropy = calculate_input_entropy(inputs)
-    response_entropy = calculate_response_entropy(inputs, outputs)
-    information_gain = calculate_information_gain(inputs, outputs)
+    input_entropy = calculate_input_entropy(prompts)
+    response_entropy = calculate_response_entropy(prompts, completions)
+    information_gain = calculate_information_gain(prompts, completions)
     
     return {
         "input_entropy": input_entropy,

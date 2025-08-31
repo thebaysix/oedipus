@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .routes import datasets, outputs, analysis, comparisons
+from .routes import completions, datasets, analysis, comparisons
 from ..core.database import engine, Base
 
 # Create database tables
@@ -26,7 +26,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(datasets.router)
-app.include_router(outputs.router)
+app.include_router(completions.router)
 app.include_router(analysis.router)
 app.include_router(comparisons.router)
 

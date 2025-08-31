@@ -13,7 +13,7 @@ This directory contains sample datasets for testing the Oedipus React Frontend c
 ### `sample_outputs_model_a.csv` 
 - **100 output records** from "Model A"
 - Format: `input_id`, `output_text`
-- Some input_ids have multiple outputs (1:many relationship)
+- Some input_ids have multiple completions (1:many relationship)
 - Academic/technical writing style
 - Detailed, comprehensive responses
 
@@ -22,7 +22,7 @@ This directory contains sample datasets for testing the Oedipus React Frontend c
 - Format: `input_id`, `output_text`
 - Conversational, engaging writing style
 - Uses analogies and simplified explanations
-- Some overlap with Model A inputs for comparison testing
+- Some overlap with Model A prompts for comparison testing
 
 ## Usage Instructions
 
@@ -30,7 +30,7 @@ This directory contains sample datasets for testing the Oedipus React Frontend c
 ```
 1. Navigate to React app: http://localhost:3000
 2. Upload sample_inputs.csv
-3. Verify data preview shows 100 inputs
+3. Verify data preview shows 100 prompts
 4. Upload sample_outputs_model_a.csv
 5. Create single analysis
 ```
@@ -46,8 +46,8 @@ This directory contains sample datasets for testing the Oedipus React Frontend c
 
 ### 3. Test Edge Cases
 ```
-- Upload inputs without outputs
-- Upload outputs without matching inputs
+- Upload prompts without completions
+- Upload completions without matching prompts
 - Test CSV validation errors
 - Test large dataset handling
 ```
@@ -85,8 +85,8 @@ The analysis should reveal:
 ### Output Patterns
 - **Model A**: Covers input_ids 1-50 (2 responses each)
 - **Model B**: Covers input_ids 1-50 + additional responses for 25,30,35,40,45,50
-- **Overlapping inputs**: 1-50 (perfect for comparison)
+- **Overlapping prompts**: 1-50 (perfect for comparison)
 - **Model A only**: None
 - **Model B only**: 6 additional responses
 
-This structure allows testing both aligned comparisons (same inputs) and coverage analysis (different input coverage).
+This structure allows testing both aligned comparisons (same prompts) and coverage analysis (different input coverage).

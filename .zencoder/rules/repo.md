@@ -6,7 +6,7 @@ alwaysApply: true
 # Oedipus MVP Information
 
 ## Summary
-Oedipus is an observability and analytics infrastructure for AI systems. The repository contains a fully implemented MVP focused on bulk upload analysis of AI model completions. The system provides comprehensive information-theoretic analysis of model behavior patterns and now includes comparison capabilities for multiple model completions.
+Oedipus is an observability and analytics infrastructure for AI systems. The repository contains a fully implemented MVP with a primary focus on comparative analysis of AI model completions. The system provides comprehensive information-theoretic analysis of model behavior patterns and features a new React-based frontend optimized for side-by-side comparison of multiple model completions.
 
 ## Structure
 - **app/**: Backend FastAPI application
@@ -16,28 +16,30 @@ Oedipus is an observability and analytics infrastructure for AI systems. The rep
   - **schemas/**: Pydantic validation schemas
   - **services/**: Business logic and analysis services
   - **workers/**: Celery background tasks
-- **frontend/**: Streamlit-based user interface
-  - **components/**: UI components (dashboard, upload, visualizations, comparison)
-  - **utils/**: Helper functions for data processing
+- **react-frontend/**: New React-based user interface
+  - **src/components/**: UI components (ComparisonTable, DatasetUpload, MetricsComparison)
+  - **src/hooks/**: Custom React hooks for API integration
+  - **src/utils/**: Helper functions for data processing
+- **frontend/**: Legacy Streamlit-based user interface
 - **scripts/**: Setup and startup scripts
 - **tests/**: Test suite for API and metrics
 - **alembic/**: Database migration scripts with version history
 
 ## Language & Runtime
-**Language**: Python 3.13.7
-**Build System**: pip
-**Package Manager**: pip
+**Language**: Python 3.13.7 (Backend), TypeScript/JavaScript (Frontend)
+**Build System**: pip (Backend), Vite (Frontend)
+**Package Manager**: pip (Backend), npm (Frontend)
 **Database**: PostgreSQL 15
 **Cache/Queue**: Redis 7
 
 ## Dependencies
+
+### Backend Dependencies
 **Main Dependencies**:
 - FastAPI 0.104.1+: API framework
 - SQLAlchemy 1.4.48: ORM
 - Alembic 1.12.1: Database migrations
 - Celery 5.3.4: Background task processing
-- Streamlit 1.48.0+: Frontend UI
-- Plotly 5.17.0: Data visualization
 - Pandas 2.0.0+: Data manipulation
 - NumPy 1.24.0+: Numerical processing
 - Tiktoken 0.11.0+: Token counting
@@ -50,7 +52,26 @@ Oedipus is an observability and analytics infrastructure for AI systems. The rep
 - httpx 0.25.2: HTTP client for testing
 - python-dotenv 1.0.0: Environment variable management
 
+### React Frontend Dependencies
+**Main Dependencies**:
+- React 18.2.0: UI framework
+- TypeScript: Type-safe development
+- React Router 6.30.1: Navigation
+- TanStack React Query 4.32.6: Data fetching
+- Recharts 2.8.0: Data visualization
+- Zustand 4.4.1: State management
+- React Dropzone 14.2.3: File upload
+- PapaParse 5.4.1: CSV parsing
+
+**Development Dependencies**:
+- Vite 4.4.5: Build tool
+- Tailwind CSS 3.3.3: Utility-first CSS
+- ESLint 8.45.0: Code linting
+- TypeScript 5.0.2: Type checking
+
 ## Build & Installation
+
+### Backend
 ```bash
 # Clone repository
 git clone <repository>
@@ -63,6 +84,18 @@ docker compose up --build
 python scripts/setup.py
 docker compose up -d  # PostgreSQL + Redis
 alembic upgrade head
+```
+
+### React Frontend
+```bash
+# From repository root
+cd react-frontend
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
 ```
 
 ## Docker
@@ -90,20 +123,26 @@ python scripts/start_backend.py
 # Terminal 2: Celery worker
 python scripts/start_worker.py
 
-# Terminal 3: Frontend
-python scripts/start_frontend.py
+# Terminal 3: React Frontend
+cd react-frontend
+npm run dev
+# Or use the PowerShell script
+.\start_react_frontend.ps1
 ```
 
 **Access Points**:
-- Frontend UI: http://localhost:8501
+- React Frontend: http://localhost:3000
 - API Documentation: http://localhost:8000/docs
 - API Health: http://localhost:8000/health
 
 ## Features
 - **Dataset Management**: Upload and version prompt datasets
-- **Output Data Upload**: Support for multi-output relationships
+- **Completion Data Upload**: Support for multi-completion relationships
+- **Comparative Analysis**: Side-by-side comparison of multiple model completions
+- **Statistical Testing**: Significance testing between model outputs
+- **Interactive Visualizations**: Charts and metrics for model comparison
+- **Automated Insights**: AI-generated observations about model differences
 - **Information-Theoretic Analysis**: Metrics like entropy, information gain
-- **Visualization Dashboard**: Interactive metric visualizations
 - **Background Processing**: Celery-based task queue for analysis jobs
 - **Database Migrations**: Alembic for schema versioning
 - **Model Comparison**: Side-by-side comparison of multiple model completions
@@ -112,14 +151,37 @@ python scripts/start_frontend.py
 
 ## API Endpoints
 - **Datasets**: `/api/v1/datasets/` - Create, list, and retrieve datasets
-- **Outputs**: `/api/v1/datasets/{id}/completions` - Manage completion datasets
+- **Outlier Detection**: Statistical analysis to identify anomalous completions
+- **Alignment Analysis**: Coverage statistics and matched prompt tracking
+
+## API Endpoints
+- **Datasets**: `/api/v1/datasets/` - Create, list, and retrieve prompt datasets
+- **Completions**: `/api/v1/datasets/{id}/completions` - Manage completion datasets
 - **Analysis**: `/api/v1/analysis/run` - Run analysis jobs
 - **Comparisons**: `/api/v1/comparisons/` - Create and manage model comparisons
 
+## React Frontend
+**Key Components**:
+- **ComparisonTable**: Side-by-side view of model completions
+- **DatasetUpload**: CSV upload with validation
+- **MetricsComparison**: Statistical visualizations
+- **StatisticalTests**: Hypothesis testing results
+- **InsightsPanel**: Auto-generated insights
+- **Export**: Report generation
+
+**Routes**:
+- **Main App** (`/`): Complete comparative analysis workflow
+- **Diagnostic** (`#/diagnostic`): System health checks
+- **Simple Test** (`#/simple`): Basic rendering verification
+- **Debug Hooks** (`#/debug`): API integration debugging
+
 ## Performance
-- 1,000 input/completion pairs: < 5 minutes
+- 1,000 prompt/completion pairs: < 5 minutes
 - 10,000 prompts with multiple completions: < 15 minutes
 - Complex analysis with all metrics: < 2 minutes
 
-## Testing
-**targetFramework**: Playwright
+## Terminology Update
+The project has standardized terminology:
+- "Input" → "Prompt": Text provided to the AI model
+- "Output" → "Completion": Text generated by the AI model
+- Database schema and API endpoints updated accordingly

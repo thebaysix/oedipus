@@ -7,6 +7,18 @@ from scipy import stats
 import math
 
 
+def _get_friendly_metric_name(metric_key: str) -> str:
+    """Convert internal metric keys to user-friendly names."""
+    friendly_names = {
+        "completion_length": "Completion Length",
+        "completion_count": "Completion Count", 
+        "unique_completions": "Unique Completions",
+        "avg_word_count": "Average Word Count",
+        "response_diversity": "Completion Diversity"
+    }
+    return friendly_names.get(metric_key, metric_key.replace("_", " ").title())
+
+
 def run_statistical_tests(completions_by_dataset: Dict[str, Dict[str, List[str]]]) -> List[Dict[str, Any]]:
     """
     Run statistical tests comparing multiple completion datasets.
@@ -42,8 +54,9 @@ def run_statistical_tests(completions_by_dataset: Dict[str, Dict[str, List[str]]
                     if len(values_a) > 1 and len(values_b) > 1:
                         stat_result = _run_t_test(values_a, values_b)
                         
+                        friendly_name = _get_friendly_metric_name(metric_name)
                         metrics.append({
-                            "name": f"{metric_name} ({dataset_a} vs {dataset_b})",
+                            "name": friendly_name,
                             "dataset_a": dataset_a,
                             "dataset_b": dataset_b,
                             "dataset_a_value": np.mean(values_a),

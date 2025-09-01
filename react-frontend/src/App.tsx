@@ -41,12 +41,15 @@ type Step = 'upload' | 'compare' | 'results';
 function App() {
   const [currentStep, setCurrentStep] = useState<Step>('upload');
   const [selectedComparison, setSelectedComparison] = useState<string>('');
+  const [selectedPromptDatasets, setSelectedPromptDatasets] = useState<string[]>([]);
+  const [selectedCompletionDatasets, setSelectedCompletionDatasets] = useState<string[]>([]);
   
   const { 
     files, 
     processFiles, 
     removeFile, 
     updateFileType, 
+    updateFileName,
     uploadFile, 
     clearFiles,
     isUploading 
@@ -62,6 +65,21 @@ function App() {
       refetchOutputs();
     }
   }, [datasets.length, refetchOutputs]);
+
+  // Auto-select datasets when available (for better UX)
+  useEffect(() => {
+    // Auto-select the first prompt dataset if none selected
+    if (datasets.length > 0 && selectedPromptDatasets.length === 0) {
+      setSelectedPromptDatasets([datasets[0].id]);
+    }
+  }, [datasets, selectedPromptDatasets.length]);
+
+  useEffect(() => {
+    // Auto-select first two completion datasets if none selected and we have at least 2
+    if (allCompletionDatasets.length >= 2 && selectedCompletionDatasets.length === 0) {
+      setSelectedCompletionDatasets(allCompletionDatasets.slice(0, 2).map(d => d.id));
+    }
+  }, [allCompletionDatasets, selectedCompletionDatasets.length]);
   
 
   
@@ -104,18 +122,58 @@ function App() {
   const alignment: AlignmentResult | null = comparison?.statistical_results?.alignment || null;
   const metrics: StatisticalMetric[] = comparison?.statistical_results?.metrics || [];
 
+  // Helper functions for dataset selection
+  const togglePromptDataset = (datasetId: string) => {
+    setSelectedPromptDatasets(prev => 
+      prev.includes(datasetId) 
+        ? prev.filter(id => id !== datasetId)
+        : [...prev, datasetId]
+    );
+  };
+
+  const toggleCompletionDataset = (datasetId: string) => {
+    setSelectedCompletionDatasets(prev => 
+      prev.includes(datasetId) 
+        ? prev.filter(id => id !== datasetId)
+        : [...prev, datasetId]
+    );
+  };
+
+  // Validation for selected datasets
+  const isValidSelection = selectedPromptDatasets.length === 1 && selectedCompletionDatasets.length >= 2;
+  const selectionError = selectedPromptDatasets.length === 0 
+    ? 'Please select exactly 1 prompt dataset'
+    : selectedPromptDatasets.length > 1 
+    ? 'Please select only 1 prompt dataset'
+    : selectedCompletionDatasets.length < 2
+    ? 'Please select at least 2 completion datasets'
+    : null;
+
+  // Helper function to format timestamps
+  const formatTimestamp = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
+
   const handleCreateComparison = async () => {
-    // Check if we have at least 1 prompt dataset and 2 completion datasets
-    if (datasets.length === 0 || allCompletionDatasets.length < 2) {
-      alert('Please upload at least one prompt dataset and two completion datasets');
+    // Validate selection
+    if (!isValidSelection) {
+      alert(selectionError || 'Invalid dataset selection');
       return;
     }
 
     try {
       const result = await createComparisonMutation.mutateAsync({
         name: `Comparison ${new Date().toLocaleString()}`,
-        dataset_id: datasets[0].id,
-        completion_dataset_ids: allCompletionDatasets.slice(0, 2).map(d => d.id), // Compare first two completions
+        dataset_id: selectedPromptDatasets[0],
+        completion_dataset_ids: selectedCompletionDatasets,
         alignment_key: 'prompt_id'
       });
       
@@ -215,6 +273,7 @@ function App() {
                 file={file}
                 onRemove={removeFile}
                 onTypeChange={updateFileType}
+                onNameChange={updateFileName}
                 onUpload={uploadFile}
                 promptDatasets={uploadedPromptDatasets}
                 disabled={isUploading}
@@ -252,41 +311,88 @@ function App() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Available Prompt & Completion Datasets
             </label>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {/* Prompt Datasets */}
-              {datasets.slice(-5).map(dataset => (
-                <div key={dataset.id} className="flex items-center gap-3 p-3 border rounded">
-                  <Database className="w-5 h-5 text-blue-500" />
-                  <div>
-                    <div className="font-medium">{dataset.name} <span className="text-xs bg-blue-100 text-blue-800 px-1 rounded">PROMPTS</span></div>
-                    <div className="text-sm text-gray-500">
-                      {Object.keys(dataset.prompts).length} prompts • Created {new Date(dataset.created_at).toLocaleDateString()}
+              <div>
+                <h4 className="text-sm font-medium text-gray-700 mb-2">Prompt Datasets (select exactly 1):</h4>
+                <div className="space-y-2">
+                  {datasets.slice(-5).map(dataset => (
+                    <div key={dataset.id} className={clsx(
+                      "flex items-center gap-3 p-3 border rounded cursor-pointer transition-colors",
+                      selectedPromptDatasets.includes(dataset.id) 
+                        ? "border-blue-500 bg-blue-50" 
+                        : "border-gray-200 hover:border-blue-300"
+                    )} onClick={() => togglePromptDataset(dataset.id)}>
+                      <input
+                        type="checkbox"
+                        checked={selectedPromptDatasets.includes(dataset.id)}
+                        onChange={() => togglePromptDataset(dataset.id)}
+                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <Database className="w-5 h-5 text-blue-500" />
+                      <div className="flex-1">
+                        <div className="font-medium">{dataset.name} <span className="text-xs bg-blue-100 text-blue-800 px-1 rounded">PROMPTS</span></div>
+                        <div className="text-sm text-gray-500">
+                          {Object.keys(dataset.prompts).length} prompts • Created {formatTimestamp(dataset.created_at)}
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
-              ))}
+              </div>
               
               {/* Completion Datasets */}
-              {allCompletionDatasets.map(completionDataset => (
-                <div key={completionDataset.id} className="flex items-center gap-3 p-3 border rounded">
-                  <Database className="w-5 h-5 text-green-500" />
-                  <div>
-                    <div className="font-medium">{completionDataset.name} <span className="text-xs bg-green-100 text-green-800 px-1 rounded">COMPLETIONS</span></div>
-                    <div className="text-sm text-gray-500">
-                      {completionDataset.metadata?.total_completions || 0} completions across {completionDataset.metadata?.unique_inputs || 0} unique prompts • Created {new Date(completionDataset.created_at).toLocaleDateString()}
+              <div>
+                <h4 className="text-sm font-medium text-gray-700 mb-2">Completion Datasets (select 2 or more):</h4>
+                <div className="space-y-2">
+                  {allCompletionDatasets.map(completionDataset => (
+                    <div key={completionDataset.id} className={clsx(
+                      "flex items-center gap-3 p-3 border rounded cursor-pointer transition-colors",
+                      selectedCompletionDatasets.includes(completionDataset.id) 
+                        ? "border-green-500 bg-green-50" 
+                        : "border-gray-200 hover:border-green-300"
+                    )} onClick={() => toggleCompletionDataset(completionDataset.id)}>
+                      <input
+                        type="checkbox"
+                        checked={selectedCompletionDatasets.includes(completionDataset.id)}
+                        onChange={() => toggleCompletionDataset(completionDataset.id)}
+                        className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                      />
+                      <Database className="w-5 h-5 text-green-500" />
+                      <div className="flex-1">
+                        <div className="font-medium">{completionDataset.name} <span className="text-xs bg-green-100 text-green-800 px-1 rounded">COMPLETIONS</span></div>
+                        <div className="text-sm text-gray-500">
+                          {completionDataset.metadata?.total_completions || 0} completions across {completionDataset.metadata?.unique_inputs || 0} unique prompts • Created {formatTimestamp(completionDataset.created_at)}
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
-              ))}
+              </div>
             </div>
           </div>
 
 
 
+          {/* Selection Summary */}
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h4 className="text-sm font-medium text-gray-700 mb-2">Selection Summary:</h4>
+            <div className="text-sm text-gray-600 space-y-1">
+              <div>Prompt datasets: {selectedPromptDatasets.length} selected</div>
+              <div>Completion datasets: {selectedCompletionDatasets.length} selected</div>
+              {selectionError && (
+                <div className="text-orange-600 font-medium">⚠ {selectionError}</div>
+              )}
+              {isValidSelection && (
+                <div className="text-green-600 font-medium">✓ Ready to create comparison</div>
+              )}
+            </div>
+          </div>
+
           <div className="pt-4">
             <button
               onClick={handleCreateComparison}
-              disabled={createComparisonMutation.isPending || datasets.length === 0 || isLoadingOutputs || allCompletionDatasets.length < 2}
+              disabled={createComparisonMutation.isPending || !isValidSelection || isLoadingOutputs}
               className={clsx(
                 'w-full px-4 py-2 rounded-lg font-medium transition-colors',
                 'bg-primary-500 text-white hover:bg-primary-600',
@@ -306,15 +412,17 @@ function App() {
             {/* Status message */}
             <div className="text-sm text-gray-600 mt-2">
               {datasets.length === 0 ? (
-                <span className="text-orange-600">⚠ Need at least 1 prompt dataset</span>
+                <span className="text-orange-600">⚠ Upload at least 1 prompt dataset first</span>
               ) : isLoadingOutputs ? (
                 <span className="text-blue-600">🔄 Loading completions...</span>
               ) : completionDatasetsError ? (
                 <span className="text-red-600">❌ Error loading completions</span>
               ) : allCompletionDatasets.length < 2 ? (
-                <span className="text-orange-600">⚠ Need at least 2 completion datasets (currently {allCompletionDatasets.length})</span>
+                <span className="text-orange-600">⚠ Upload at least 2 completion datasets first</span>
+              ) : !isValidSelection ? (
+                <span className="text-orange-600">⚠ {selectionError}</span>
               ) : (
-                <span className="text-green-600">✓ Ready to compare {allCompletionDatasets.length} completion datasets</span>
+                <span className="text-green-600">✓ Ready to create comparison with selected datasets</span>
               )}
             </div>
           </div>

@@ -8,6 +8,7 @@ interface DatasetPreviewProps {
   file: UploadedFile;
   onRemove: (fileId: string) => void;
   onTypeChange: (fileId: string, type: 'prompt' | 'completion') => void;
+  onNameChange: (fileId: string, name: string) => void;
   onUpload: (fileId: string, promptDatasetId?: string) => void;
   promptDatasets?: Array<{ id: string; name: string }>;
   disabled?: boolean;
@@ -17,6 +18,7 @@ export const DatasetPreview: React.FC<DatasetPreviewProps> = ({
   file,
   onRemove,
   onTypeChange,
+  onNameChange,
   onUpload,
   promptDatasets = [],
   disabled = false
@@ -115,6 +117,32 @@ export const DatasetPreview: React.FC<DatasetPreviewProps> = ({
             Completion Dataset
           </button>
         </div>
+      </div>
+
+      {/* Dataset Name Input */}
+      <div className="mb-3">
+        <label className="block text-sm text-gray-600 mb-1">
+          Dataset Name:
+        </label>
+        <input
+          type="text"
+          value={file.displayName || file.name.replace('.csv', '')}
+          onChange={(e) => onNameChange(file.id, e.target.value)}
+          disabled={disabled || file.status !== 'pending'}
+          placeholder={file.type === 'prompt' ? 'e.g., "Customer Support Prompts"' : 'e.g., "GPT-4", "Claude-3", "Gemini"'}
+          className={clsx(
+            'w-full px-3 py-2 text-sm border rounded-md transition-colors',
+            'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+            'disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-50',
+            file.status === 'pending' ? 'border-gray-300' : 'border-gray-200'
+          )}
+        />
+        <p className="text-xs text-gray-500 mt-1">
+          {file.type === 'prompt' 
+            ? 'Give your prompt dataset a descriptive name'
+            : 'Use model names like "GPT-4", "Claude-3", etc. for easy comparison'
+          }
+        </p>
       </div>
 
       {/* Error Message */}

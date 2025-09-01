@@ -128,6 +128,12 @@ export const useUpload = () => {
     }));
   }, []);
 
+  const updateFileName = useCallback((fileId: string, displayName: string) => {
+    setFiles(prev => prev.map(f => 
+      f.id === fileId ? { ...f, displayName } : f
+    ));
+  }, []);
+
   const uploadFile = useCallback(async (fileId: string, promptDatasetId?: string) => {
     const file = files.find(f => f.id === fileId);
     if (!file) return;
@@ -139,7 +145,7 @@ export const useUpload = () => {
     try {
       const formData = new FormData();
       formData.append('file', file.file);
-      formData.append('name', file.name.replace('.csv', ''));
+      formData.append('name', file.displayName || file.name.replace('.csv', ''));
 
       if (file.type === 'prompt') {
         const result = await createDatasetMutation.mutateAsync(formData);
@@ -179,6 +185,7 @@ export const useUpload = () => {
     processFiles,
     removeFile,
     updateFileType,
+    updateFileName,
     uploadFile,
     clearFiles,
     isUploading: createDatasetMutation.isPending || createCompletionDatasetMutation.isPending

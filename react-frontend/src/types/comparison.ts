@@ -60,6 +60,7 @@ export interface UploadedFile {
   id: string;
   file: File;
   name: string;
+  displayName?: string; // User-defined name for the dataset
   preview: string[][];
   headers: string[];
   rowCount: number;

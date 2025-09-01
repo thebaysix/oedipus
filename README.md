@@ -1,12 +1,22 @@
 # Oedipus
 
 Observation → grounding in monitoring/logging model completions.
+
 Evaluation → structured scoring of model behaviors.
+
 Diagnostics → pinpointing failure modes, systematic weaknesses.
+
 Information-theoretic → ties directly to your entropy/empowerment/information gain metrics.
+
 Performance → addresses task completion, factual accuracy, benchmarks.
+
 Understanding → reflects deeper interpretability and model behavior insights.
+
 Safety → emphasizes alignment, risk detection, and responsible deployment.
+
+## Preview
+
+![Preview of Oedipus](assets/preview.png)
 
 # Oedipus MVP - Phase 1
 
@@ -124,113 +134,222 @@ python scripts/start_frontend.py
 - Choose alignment key (typically "prompt_id")
 - Set comparison name and parameters
 
-### 4. View Results
-- **Step 3: View Results** - Explore comprehensive analysis
-- **Real-time Progress**: Watch analysis progress with visual indicators
-- **Statistical Metrics**: View detailed comparison statistics
-- **Automated Insights**: Read AI-generated observations about your data
-- **Interactive Charts**: Explore visual comparisons between models
-- **Export Options**: Download results for further analysis
+### 4. View Results - Business-Focused Analysis
+- **Step 3: View Results** - Get actionable insights for decision-making
+- **Model Comparison Summary**: Instant overview with decision guidance
+- **⭐ Star Ratings**: See statistical significance at a glance (1-3 stars)
+- **🔴🟡🟢 Impact Indicators**: Visual cues for business impact levels
+- **📊 Performance Numbers**: Raw dataset values always visible (e.g., Dataset A: 124.920, Dataset B: 170.911)
+- **💡 Business Insights**: Plain-language explanations with percentage differences
+- **🎯 Recommendations**: Specific advice on which metrics should drive your decision
+- **📋 Technical Details**: Expandable sections for statistical depth (p-values, effect sizes, confidence intervals)
+- **📊 Interactive Charts**: Visual comparisons with business context
+- **📤 Export Options**: Business reports and technical data downloads
 
-### Example Workflow
-1. **Upload prompts.csv** with your test prompts
+### Example Workflow & Expected Results
+1. **Upload prompts.csv** with your test prompts (e.g., 500 customer service scenarios)
 2. **Upload gpt4_completions.csv** with GPT-4 responses
-3. **Upload claude_completions.csv** with Claude responses
-4. **Create comparison** named "GPT-4 vs Claude Analysis"
-5. **Monitor progress** through the 4-step analysis process
-6. **Explore results** with statistical significance testing and insights
+3. **Upload claude_completions.csv** with Claude responses  
+4. **Create comparison** named "GPT-4 vs Claude for Customer Service"
+5. **Monitor progress** through the 4-step analysis process with real-time updates
+6. **Get business insights** like:
+   - 🔴 **Completion Length**: "Claude shows 26.9% longer responses - major factor for detailed support"
+   - ⭐⭐⭐ **High Confidence**: "Very significant difference (p < 0.001) - reliable for decision-making"
+   - 🎯 **Recommendation**: "Choose Claude for comprehensive support, GPT-4 for concise responses"
+7. **Make informed decisions** based on clear business impact indicators
 
 ## Features
 
-### Comparative Analysis
-- **Side-by-side Model Comparison**: Compare multiple AI model completions
-- **Statistical Significance Testing**: T-tests with p-values and effect sizes
-- **Data Alignment**: Automatic matching of prompts across completion datasets
-- **Real-time Progress Tracking**: Visual progress bar with step-by-step updates
+### Business-Focused Comparative Analysis
+Oedipus provides an intuitive, business-friendly interface for comparing AI model performance with actionable insights for decision-making.
 
-### Statistical Metrics
-The analysis computes comprehensive metrics for comparing model performance:
+#### **Quick Decision Making**
+- **⭐ Star Rating System**: Instantly see statistical significance (1-3 stars)
+- **🔴🟡🟢 Impact Indicators**: Visual cues for business impact (Large/Medium/Small)
+- **📊 At-a-Glance Numbers**: Raw performance values always visible
+- **🎯 Decision Guidance**: Contextual recommendations based on your results
+
+#### **Progressive Information Disclosure**
+- **Business Summary First**: Key insights and recommendations prominently displayed
+- **Technical Details Available**: Expandable sections for statistical details (p-values, effect sizes, confidence intervals)
+- **Plain Language Explanations**: Complex statistics translated into business terms
+- **Actionable Recommendations**: Specific guidance on which metrics matter most
+
+#### **Comprehensive Model Comparison**
+- **Side-by-side Analysis**: Compare multiple AI model completions simultaneously
+- **Automatic Data Alignment**: Smart matching of prompts across completion datasets
+- **Real-time Progress Tracking**: Visual progress bar with step-by-step updates
+- **Coverage Analysis**: Data quality assessment and alignment statistics
+
+### Statistical Metrics & Business Interpretation
+
+The system analyzes multiple dimensions of model performance with both statistical rigor and business relevance:
 
 #### **Completion Length Analysis**
-- **Purpose**: Compares average response length between models
+- **Business Value**: Understand which model provides more detailed vs. concise responses
+- **Decision Impact**: Choose models based on your need for brevity or comprehensiveness
+- **Statistical Measure**: Compares average response length between models
 - **Interpretation**: 
-  - Positive effect size: Model A generates longer responses
-  - Negative effect size: Model B generates longer responses
-  - P-value < 0.05: Statistically significant difference in length
+  - 🔴 Large differences (≥26% variation): Major factor in model selection
+  - 🟡 Medium differences (10-25% variation): Consider for specific use cases
+  - 🟢 Small differences (<10% variation): Minor consideration
 
 #### **Completion Count Analysis**
-- **Purpose**: Compares number of completions per prompt
+- **Business Value**: Evaluate model creativity and response variety
+- **Decision Impact**: Important for applications requiring diverse outputs
+- **Statistical Measure**: Compares number of completions per prompt
 - **Interpretation**: 
-  - Higher count indicates more diverse/multiple responses
-  - Useful for evaluating model creativity and response variety
+  - Higher count = More diverse/multiple responses per prompt
+  - Lower count = More focused, single-response behavior
 
 #### **Unique Completion Ratio**
-- **Purpose**: Measures response diversity within each model
+- **Business Value**: Measure response originality and avoid repetitive outputs
+- **Decision Impact**: Critical for creative applications and user engagement
+- **Statistical Measure**: Ratio of unique responses within each model
 - **Interpretation**: 
-  - Higher ratio = more unique, diverse responses
-  - Lower ratio = more repetitive responses
-  - Range: 0.0 (all identical) to 1.0 (all unique)
+  - 1.0 = All responses unique (maximum creativity)
+  - 0.5 = Half of responses are duplicates
+  - 0.0 = All responses identical (no creativity)
 
 #### **Word Count Distribution**
-- **Purpose**: Analyzes vocabulary richness and response complexity
+- **Business Value**: Assess vocabulary richness and response complexity
+- **Decision Impact**: Choose models that match your content depth requirements
+- **Statistical Measure**: Analyzes vocabulary usage patterns
 - **Interpretation**: 
-  - Higher word count may indicate more detailed responses
-  - Significant differences suggest varying response styles
+  - Higher word count = More detailed, comprehensive responses
+  - Lower word count = More concise, focused responses
 
 #### **Response Diversity Index**
-- **Purpose**: Measures overall variation in completion patterns
+- **Business Value**: Understand consistency vs. variability in model behavior
+- **Decision Impact**: Balance predictability with creative variation
+- **Statistical Measure**: Overall variation in completion patterns
 - **Interpretation**: 
-  - Higher diversity = more varied response patterns
-  - Lower diversity = more consistent response patterns
+  - Higher diversity = More varied response patterns (creative but less predictable)
+  - Lower diversity = More consistent response patterns (predictable but potentially repetitive)
 
 ### Statistical Interpretation Guide
 
-#### **P-Values (Statistical Significance)**
-- **p < 0.001**: Highly significant difference (⭐⭐⭐)
-- **p < 0.01**: Very significant difference (⭐⭐)
-- **p < 0.05**: Significant difference (⭐)
-- **p ≥ 0.05**: No significant difference
+The system uses a business-friendly approach to statistical analysis while maintaining scientific rigor:
 
-#### **Effect Sizes (Cohen's d)**
-- **|d| ≥ 0.8**: Large effect (substantial difference)
-- **|d| ≥ 0.5**: Medium effect (moderate difference)
-- **|d| ≥ 0.2**: Small effect (minor difference)
-- **|d| < 0.2**: Negligible effect (minimal difference)
+#### **Star Rating System (Statistical Significance)**
+- **⭐⭐⭐ Highly Significant** (p < 0.001): Very strong evidence of difference - high confidence for decision-making
+- **⭐⭐ Very Significant** (p < 0.01): Strong evidence of difference - reliable for business decisions  
+- **⭐ Significant** (p < 0.05): Moderate evidence of difference - consider alongside other factors
+- **No Stars** (p ≥ 0.05): No significant difference - models perform similarly on this metric
 
-#### **Confidence Intervals**
-- **95% Confidence Interval**: Range where true difference likely falls
-- **Doesn't include 0**: Suggests reliable difference between models
-- **Includes 0**: Difference may not be reliable
+#### **Business Impact Indicators (Effect Sizes)**
+- **🔴 Large Impact** (|d| ≥ 0.8): Substantial difference - major factor in model selection
+- **🟡 Medium Impact** (|d| ≥ 0.5): Moderate difference - important consideration for specific use cases
+- **🟢 Small Impact** (|d| ≥ 0.2): Minor difference - may not affect most business decisions
+- **⚪ Minimal Impact** (|d| < 0.2): Negligible difference - focus on other metrics
 
-### Automated Insights
-The system generates intelligent observations about your data:
+#### **Confidence Indicators**
+- **✅ High Confidence**: 95% confidence interval doesn't include 0 - reliable difference between models
+- **⚠️ Low Confidence**: 95% confidence interval includes 0 - difference may not be reliable
 
-#### **Dataset Coverage Analysis**
-- Reports alignment success rate between prompt and completion datasets
-- Identifies unmatched prompts that couldn't be compared
-- Provides coverage statistics for data quality assessment
+#### **Technical Details (Available on Demand)**
+For users who need detailed statistical information, each metric provides expandable access to:
+- **P-values**: Exact statistical significance values
+- **Effect Sizes (Cohen's d)**: Standardized measure of difference magnitude  
+- **95% Confidence Intervals**: Range where true difference likely falls
+- **Technical Notes**: Explanations of statistical concepts and limitations
 
-#### **Statistical Summary**
-- Highlights significant differences between models
-- Identifies which model performs better on specific metrics
-- Suggests areas for further investigation
+### Intelligent Business Insights
 
-#### **Performance Patterns**
-- Detects consistent patterns across multiple metrics
-- Identifies outliers or unusual response behaviors
-- Provides actionable recommendations for model improvement
+The system automatically generates actionable insights tailored for business decision-making:
 
-### Visualizations
-- **Interactive Statistical Charts**: Bar charts showing metric comparisons
-- **Progress Tracking**: Real-time analysis progress with step indicators
-- **Comparison Tables**: Side-by-side view of aligned completions
-- **Export Capabilities**: Download results as JSON/CSV for further analysis
+#### **Model Comparison Summary**
+- **Quick Decision Guide**: Immediate recommendations based on high-impact differences
+- **Balanced Comparison**: Guidance when differences are moderate but significant
+- **Similar Performance**: Advice when models perform equivalently
 
-### Data Processing
-- **CSV Upload Support**: Easy drag-and-drop file upload
-- **Data Validation**: Automatic format checking and error reporting
-- **Real-time Preview**: See your data before processing
-- **Background Analysis**: Non-blocking statistical computation
+#### **Key Business Insights**
+- **High Impact Metrics** (🔴): Major differentiators that should influence model choice
+- **Medium Impact Metrics** (🟡): Moderate differences to consider for specific use cases  
+- **Performance Percentages**: Concrete numbers showing relative performance differences
+- **Contextual Recommendations**: Specific advice on whether differences matter for your use case
+
+#### **Dataset Quality Assessment**
+- **Coverage Analysis**: Alignment success rate between prompt and completion datasets
+- **Data Quality Metrics**: Identification of unmatched prompts and data completeness
+- **Reliability Indicators**: Assessment of statistical confidence in results
+
+#### **Decision Support**
+- **Primary Decision Factors**: Highlights which metrics should drive your model selection
+- **Secondary Considerations**: Additional factors that may influence specific use cases
+- **Risk Assessment**: Confidence levels and reliability of observed differences
+- **Use Case Guidance**: Recommendations based on whether you need consistency vs. creativity
+
+### User Experience & Interface
+
+#### **Business-First Design**
+- **Clean, Intuitive Layout**: Information organized by business priority, not statistical complexity
+- **Visual Hierarchy**: Most important insights prominently displayed, technical details available on demand
+- **Progressive Disclosure**: Start with business summary, expand to technical details as needed
+- **Mobile-Responsive**: Works on desktop, tablet, and mobile devices
+
+#### **Interactive Visualizations**
+- **Statistical Summary Cards**: Each metric displayed as an easy-to-scan card with visual indicators
+- **Comparison Charts**: Interactive bar charts showing metric comparisons with business context
+- **Progress Tracking**: Real-time analysis progress with step-by-step updates and estimated completion
+- **Data Tables**: Side-by-side view of aligned completions for detailed inspection
+
+#### **Export & Sharing**
+- **Business Reports**: Export analysis results formatted for stakeholder presentations
+- **Technical Data**: Download raw statistical data (JSON/CSV) for further analysis
+- **Shareable Links**: Generate URLs to share specific comparison results
+- **Print-Friendly**: Optimized layouts for printing reports
+
+### Data Processing & Quality
+
+#### **Smart Data Handling**
+- **Drag-and-Drop Upload**: Easy CSV file upload with instant validation
+- **Automatic Format Detection**: Recognizes prompt_id/prompt_text and completion formats
+- **Real-time Preview**: See your data structure before processing
+- **Error Detection**: Clear feedback on data format issues with suggested fixes
+
+#### **Quality Assurance**
+- **Data Alignment**: Automatic matching of prompts across completion datasets
+- **Coverage Analysis**: Reports on data completeness and alignment success rates
+- **Validation Checks**: Ensures statistical analysis requirements are met
+- **Background Processing**: Non-blocking analysis with progress indicators
+
+#### **Performance & Reliability**
+- **Scalable Analysis**: Handles datasets from hundreds to tens of thousands of entries
+- **Robust Statistics**: Uses established statistical methods (t-tests, Cohen's d, confidence intervals)
+- **Error Handling**: Graceful handling of edge cases and data quality issues
+- **Real-time Updates**: Live progress tracking during analysis
+
+## Why Choose Oedipus for AI Model Comparison?
+
+### **Business-First Approach**
+Unlike traditional statistical tools that overwhelm users with technical jargon, Oedipus translates complex statistical analysis into clear business insights. You get immediate answers to questions like "Which model should I choose?" and "How confident can I be in this decision?"
+
+### **No Statistics Background Required**
+- **⭐ Star ratings** indicating significance (p-values)
+- **🔴🟡🟢 Visual indicators** show business impact at a glance  
+- **Plain language explanations** eliminate statistical complexity
+- **Actionable recommendations** guide decision-making
+
+### **Technical Rigor Maintained**
+While the interface is business-friendly, the underlying analysis uses rigorous statistical methods:
+- **T-tests** for significance testing
+- **Cohen's d** for effect size measurement
+- **95% Confidence intervals** for reliability assessment
+- **Multiple comparison corrections** when appropriate
+
+### **Progressive Disclosure**
+- **Start simple**: See business impact and recommendations first
+- **Dig deeper**: Expand to view technical details when needed
+- **Full transparency**: Access all statistical calculations and assumptions
+- **Flexible depth**: Choose your level of detail based on your role and needs
+
+### **Real-World Impact**
+Perfect for:
+- **Product Managers**: Make data-driven model selection decisions
+- **Engineering Teams**: Validate model performance with statistical confidence
+- **Business Stakeholders**: Understand AI performance without statistical training
+- **Data Scientists**: Access full statistical details while communicating results clearly
 
 ## API Endpoints
 
@@ -429,7 +548,3 @@ MIT License - see LICENSE file for details
 - 📖 Full documentation: See `oedipus_mvp_readme.md`
 - 🐛 Issues: Create GitHub issue
 - 💬 Questions: Open discussion
-
----
-
-**Built with ❤️ using FastAPI, Streamlit, and modern Python tools**

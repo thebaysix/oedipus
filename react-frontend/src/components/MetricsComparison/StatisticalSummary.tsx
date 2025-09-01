@@ -35,23 +35,23 @@ const getConfidenceIndicator = (ciLower: number, ciUpper: number): { icon: strin
 };
 
 const generateBusinessInterpretation = (metric: StatisticalMetric): string => {
-  const difference = metric.dataset_a_value - metric.dataset_b_value;
+  const difference = metric.dataset_b_value - metric.dataset_a_value; // Dataset B relative to Dataset A
   const isSignificant = metric.statistical_significance < 0.05;
   const effectSize = Math.abs(metric.effect_size);
   const metricName = metric.name.replace(/_/g, ' ').toLowerCase();
-  const direction = difference > 0 ? 'Dataset A' : 'Dataset B';
-  const relativeDiff = metric.dataset_b_value !== 0 ? Math.abs(difference / metric.dataset_b_value * 100) : 0;
+  const direction = difference > 0 ? 'higher' : 'lower';
+  const relativeDiff = metric.dataset_a_value !== 0 ? Math.abs(difference / metric.dataset_a_value * 100) : 0;
 
   if (!isSignificant) {
-    return `Both models perform similarly on ${metricName}. The observed ${relativeDiff.toFixed(1)}% difference is likely due to normal variation.`;
+    return `Both datasets show similar values for ${metricName}. The observed ${relativeDiff.toFixed(1)}% difference is likely due to normal variation.`;
   }
 
   if (effectSize >= 0.8) {
-    return `${direction} shows substantially better performance on ${metricName} (${relativeDiff.toFixed(1)}% difference). This is a major distinguishing factor between the models.`;
+    return `Dataset B shows substantially ${direction} values for ${metricName} (${relativeDiff.toFixed(1)}% difference). This is a major distinguishing factor between the datasets.`;
   } else if (effectSize >= 0.5) {
-    return `${direction} performs moderately better on ${metricName} (${relativeDiff.toFixed(1)}% difference). This difference may be meaningful for your use case.`;
+    return `Dataset B shows moderately ${direction} values for ${metricName} (${relativeDiff.toFixed(1)}% difference). This difference may be meaningful for your use case.`;
   } else {
-    return `${direction} shows slightly better performance on ${metricName} (${relativeDiff.toFixed(1)}% difference). While statistically significant, the practical impact may be limited.`;
+    return `Dataset B shows slightly ${direction} values for ${metricName} (${relativeDiff.toFixed(1)}% difference). While statistically significant, the practical impact may be limited.`;
   }
 };
 
@@ -76,9 +76,9 @@ const generateBusinessRecommendation = (metric: StatisticalMetric): string => {
 const MetricCard: React.FC<MetricCardProps> = ({ metric }) => {
   const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
   
-  const difference = metric.dataset_a_value - metric.dataset_b_value;
-  const relativeDifference = metric.dataset_b_value !== 0 
-    ? ((difference / metric.dataset_b_value) * 100)
+  const difference = metric.dataset_b_value - metric.dataset_a_value; // Dataset B relative to Dataset A
+  const relativeDifference = metric.dataset_a_value !== 0 
+    ? ((difference / metric.dataset_a_value) * 100)
     : 0;
   
   const isSignificant = metric.statistical_significance < 0.05;
@@ -339,10 +339,10 @@ export const StatisticalSummary: React.FC<StatisticalSummaryProps> = ({
           <div className="bg-white rounded-lg p-4 border border-blue-200">
             <h4 className="font-medium text-blue-900 mb-2 flex items-center gap-2">
               <span className="text-lg">🤝</span>
-              Similar Performance
+              Similar Values
             </h4>
             <p className="text-sm text-blue-800">
-              No statistically significant differences detected. Both models perform similarly 
+              No statistically significant differences detected. Both datasets show similar values 
               on the analyzed metrics. Consider other factors like cost, speed, or specific 
               capabilities for your decision.
             </p>
@@ -367,11 +367,11 @@ export const StatisticalSummary: React.FC<StatisticalSummaryProps> = ({
           
           <div className="space-y-3">
             {highImpactMetrics.map((metric, index) => {
-              const direction = metric.dataset_a_value > metric.dataset_b_value ? 'Dataset A' : 'Dataset B';
               const metricName = metric.name.replace(/_/g, ' ').toLowerCase();
               const relativeDiff = metric.dataset_b_value !== 0 
                 ? Math.abs((metric.dataset_a_value - metric.dataset_b_value) / metric.dataset_b_value * 100)
                 : 0;
+              const direction = metric.dataset_a_value > metric.dataset_b_value ? 'lower' : 'higher';
               
               return (
                 <div key={index} className="flex items-start gap-3 p-3 bg-white rounded-lg border border-amber-200">
@@ -379,7 +379,7 @@ export const StatisticalSummary: React.FC<StatisticalSummaryProps> = ({
                   <div>
                     <h4 className="font-medium text-amber-900 capitalize">{metricName}</h4>
                     <p className="text-sm text-amber-800">
-                      <strong>{direction}</strong> shows {relativeDiff.toFixed(1)}% better performance. 
+                      <strong>Dataset B</strong> shows {relativeDiff.toFixed(1)}% {direction} values than Dataset A. 
                       This is a major differentiator that should influence your model choice.
                     </p>
                   </div>
@@ -388,11 +388,11 @@ export const StatisticalSummary: React.FC<StatisticalSummaryProps> = ({
             })}
             
             {mediumImpactMetrics.map((metric, index) => {
-              const direction = metric.dataset_a_value > metric.dataset_b_value ? 'Dataset A' : 'Dataset B';
               const metricName = metric.name.replace(/_/g, ' ').toLowerCase();
               const relativeDiff = metric.dataset_b_value !== 0 
                 ? Math.abs((metric.dataset_a_value - metric.dataset_b_value) / metric.dataset_b_value * 100)
                 : 0;
+              const direction = metric.dataset_a_value > metric.dataset_b_value ? 'lower' : 'higher';
               
               return (
                 <div key={`medium-${index}`} className="flex items-start gap-3 p-3 bg-white rounded-lg border border-amber-200">
@@ -400,7 +400,7 @@ export const StatisticalSummary: React.FC<StatisticalSummaryProps> = ({
                   <div>
                     <h4 className="font-medium text-amber-900 capitalize">{metricName}</h4>
                     <p className="text-sm text-amber-800">
-                      <strong>{direction}</strong> performs {relativeDiff.toFixed(1)}% better. 
+                      <strong>Dataset B</strong> shows {relativeDiff.toFixed(1)}% {direction} values than Dataset A. 
                       Consider if this difference matters for your specific use case.
                     </p>
                   </div>

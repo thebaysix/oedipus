@@ -16,7 +16,7 @@ Safety → emphasizes alignment, risk detection, and responsible deployment.
 
 ## Preview
 
-![Preview of Oedipus](assets/preview.png)
+![Preview of Oedipus](assets/oedipus-preview.png)
 
 # Oedipus MVP - Phase 1
 

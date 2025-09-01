@@ -318,22 +318,27 @@ function App() {
                 <div className="space-y-2">
                   {datasets.slice(-5).map(dataset => (
                     <div key={dataset.id} className={clsx(
-                      "flex items-center gap-3 p-3 border rounded cursor-pointer transition-colors",
+                      "flex items-center gap-3 p-3 border rounded transition-colors",
                       selectedPromptDatasets.includes(dataset.id) 
                         ? "border-blue-500 bg-blue-50" 
                         : "border-gray-200 hover:border-blue-300"
-                    )} onClick={() => togglePromptDataset(dataset.id)}>
+                    )}>
                       <input
                         type="checkbox"
                         checked={selectedPromptDatasets.includes(dataset.id)}
                         onChange={() => togglePromptDataset(dataset.id)}
-                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
                       />
-                      <Database className="w-5 h-5 text-blue-500" />
-                      <div className="flex-1">
-                        <div className="font-medium">{dataset.name} <span className="text-xs bg-blue-100 text-blue-800 px-1 rounded">PROMPTS</span></div>
-                        <div className="text-sm text-gray-500">
-                          {Object.keys(dataset.prompts).length} prompts • Created {formatTimestamp(dataset.created_at)}
+                      <div 
+                        className="flex items-center gap-3 flex-1 cursor-pointer"
+                        onClick={() => togglePromptDataset(dataset.id)}
+                      >
+                        <Database className="w-5 h-5 text-blue-500" />
+                        <div className="flex-1">
+                          <div className="font-medium">{dataset.name} <span className="text-xs bg-blue-100 text-blue-800 px-1 rounded">PROMPTS</span></div>
+                          <div className="text-sm text-gray-500">
+                            {Object.keys(dataset.prompts).length} prompts • Created {formatTimestamp(dataset.created_at)}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -347,22 +352,27 @@ function App() {
                 <div className="space-y-2">
                   {allCompletionDatasets.map(completionDataset => (
                     <div key={completionDataset.id} className={clsx(
-                      "flex items-center gap-3 p-3 border rounded cursor-pointer transition-colors",
+                      "flex items-center gap-3 p-3 border rounded transition-colors",
                       selectedCompletionDatasets.includes(completionDataset.id) 
                         ? "border-green-500 bg-green-50" 
                         : "border-gray-200 hover:border-green-300"
-                    )} onClick={() => toggleCompletionDataset(completionDataset.id)}>
+                    )}>
                       <input
                         type="checkbox"
                         checked={selectedCompletionDatasets.includes(completionDataset.id)}
                         onChange={() => toggleCompletionDataset(completionDataset.id)}
-                        className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                        className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500 cursor-pointer"
                       />
-                      <Database className="w-5 h-5 text-green-500" />
-                      <div className="flex-1">
-                        <div className="font-medium">{completionDataset.name} <span className="text-xs bg-green-100 text-green-800 px-1 rounded">COMPLETIONS</span></div>
-                        <div className="text-sm text-gray-500">
-                          {completionDataset.metadata?.total_completions || 0} completions across {completionDataset.metadata?.unique_inputs || 0} unique prompts • Created {formatTimestamp(completionDataset.created_at)}
+                      <div 
+                        className="flex items-center gap-3 flex-1 cursor-pointer"
+                        onClick={() => toggleCompletionDataset(completionDataset.id)}
+                      >
+                        <Database className="w-5 h-5 text-green-500" />
+                        <div className="flex-1">
+                          <div className="font-medium">{completionDataset.name} <span className="text-xs bg-green-100 text-green-800 px-1 rounded">COMPLETIONS</span></div>
+                          <div className="text-sm text-gray-500">
+                            {completionDataset.metadata?.total_completions || 0} completions across {completionDataset.metadata?.unique_inputs || 0} unique prompts • Created {formatTimestamp(completionDataset.created_at)}
+                          </div>
                         </div>
                       </div>
                     </div>

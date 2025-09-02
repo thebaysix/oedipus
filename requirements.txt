@@ -29,3 +29,4 @@ python-dotenv==1.0.0
 
 # Utilities
 PyYAML>=6.0
+reportlab>=4.0.0

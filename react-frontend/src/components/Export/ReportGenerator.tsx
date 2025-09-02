@@ -38,7 +38,7 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
   const [showShareDialog, setShowShareDialog] = useState(false);
 
   const exportOptions: Array<{ value: ExportFormat; label: string; description: string }> = [
-    { value: 'summary', label: 'Executive Summary', description: 'Key findings and recommendations (PDF)' },
+    { value: 'summary', label: 'Executive Summary', description: 'Key findings and recommendations (Text)' },
     { value: 'json', label: 'JSON Data', description: 'Complete dataset for programmatic access' },
     { value: 'csv', label: 'CSV Export', description: 'Aligned data table for spreadsheet analysis' },
     { value: 'pdf', label: 'Full Report', description: 'Comprehensive analysis report (PDF)' }
@@ -48,8 +48,7 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
     setIsExporting(true);
     
     try {
-      // This would call the backend API to generate the report
-      const reportData = {
+      const exportRequest = {
         comparison_id: comparison.id,
         format: exportConfig.format,
         include_raw_data: exportConfig.includeRawData,
@@ -58,25 +57,46 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
         include_visualizations: exportConfig.includeVisualizations
       };
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Call the backend API to generate the report
+      const response = await fetch(`/api/v1/comparisons/${comparison.id}/export`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(exportRequest)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ detail: 'Export failed' }));
+        throw new Error(errorData.detail || `Export failed with status ${response.status}`);
+      }
+
+      // Get the filename from the Content-Disposition header
+      const contentDisposition = response.headers.get('Content-Disposition');
+      let filename = `oedipus-comparison-${comparison.id}-${exportConfig.format}`;
       
-      // In a real implementation, this would download the file
-      const fileName = `oedipus-comparison-${comparison.id}-${exportConfig.format}`;
-      console.log('Generating report:', fileName, reportData);
-      
-      // Create a mock download
-      const mockData = JSON.stringify(reportData, null, 2);
-      const blob = new Blob([mockData], { type: 'application/json' });
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename=([^;]+)/);
+        if (filenameMatch) {
+          filename = filenameMatch[1].replace(/"/g, '');
+        }
+      }
+
+      // Create blob and download
+      const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${fileName}.json`;
+      a.download = filename;
+      document.body.appendChild(a);
       a.click();
+      document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
     } catch (error) {
       console.error('Export failed:', error);
+      // You might want to show a toast notification or error message here
+      alert(`Export failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsExporting(false);
     }
@@ -283,49 +303,160 @@ export const ReportGenerator: React.FC<ReportGeneratorProps> = ({
         <h4 className="font-medium text-gray-900 mb-3">Quick Actions</h4>
         <div className="flex flex-wrap gap-2">
           <button
-            onClick={() => {
-              setExportConfig({
-                format: 'summary',
-                includeRawData: false,
-                includeStatistics: true,
-                includeInsights: true,
-                includeVisualizations: false
-              });
-              generateReport();
+            onClick={async () => {
+              setIsExporting(true);
+              try {
+                const exportRequest = {
+                  comparison_id: comparison.id,
+                  format: 'summary' as const,
+                  include_raw_data: false,
+                  include_statistics: true,
+                  include_insights: true,
+                  include_visualizations: false
+                };
+
+                const response = await fetch(`/api/v1/comparisons/${comparison.id}/export`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(exportRequest)
+                });
+
+                if (!response.ok) {
+                  const errorData = await response.json().catch(() => ({ detail: 'Export failed' }));
+                  throw new Error(errorData.detail || `Export failed with status ${response.status}`);
+                }
+
+                const contentDisposition = response.headers.get('Content-Disposition');
+                let filename = `oedipus-summary-${comparison.id}`;
+                if (contentDisposition) {
+                  const filenameMatch = contentDisposition.match(/filename=([^;]+)/);
+                  if (filenameMatch) filename = filenameMatch[1].replace(/"/g, '');
+                }
+
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+              } catch (error) {
+                console.error('Export failed:', error);
+                alert(`Export failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+              } finally {
+                setIsExporting(false);
+              }
             }}
-            className="text-sm px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+            disabled={isExporting}
+            className="text-sm px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors disabled:opacity-50"
           >
             Quick Summary
           </button>
           
           <button
-            onClick={() => {
-              setExportConfig({
-                format: 'csv',
-                includeRawData: true,
-                includeStatistics: true,
-                includeInsights: false,
-                includeVisualizations: false
-              });
-              generateReport();
+            onClick={async () => {
+              setIsExporting(true);
+              try {
+                const exportRequest = {
+                  comparison_id: comparison.id,
+                  format: 'csv' as const,
+                  include_raw_data: true,
+                  include_statistics: true,
+                  include_insights: false,
+                  include_visualizations: false
+                };
+
+                const response = await fetch(`/api/v1/comparisons/${comparison.id}/export`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(exportRequest)
+                });
+
+                if (!response.ok) {
+                  const errorData = await response.json().catch(() => ({ detail: 'Export failed' }));
+                  throw new Error(errorData.detail || `Export failed with status ${response.status}`);
+                }
+
+                const contentDisposition = response.headers.get('Content-Disposition');
+                let filename = `oedipus-data-${comparison.id}.csv`;
+                if (contentDisposition) {
+                  const filenameMatch = contentDisposition.match(/filename=([^;]+)/);
+                  if (filenameMatch) filename = filenameMatch[1].replace(/"/g, '');
+                }
+
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+              } catch (error) {
+                console.error('Export failed:', error);
+                alert(`Export failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+              } finally {
+                setIsExporting(false);
+              }
             }}
-            className="text-sm px-3 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors"
+            disabled={isExporting}
+            className="text-sm px-3 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors disabled:opacity-50"
           >
             Data Export
           </button>
           
           <button
-            onClick={() => {
-              setExportConfig({
-                format: 'pdf',
-                includeRawData: false,
-                includeStatistics: true,
-                includeInsights: true,
-                includeVisualizations: true
-              });
-              generateReport();
+            onClick={async () => {
+              setIsExporting(true);
+              try {
+                const exportRequest = {
+                  comparison_id: comparison.id,
+                  format: 'pdf' as const,
+                  include_raw_data: false,
+                  include_statistics: true,
+                  include_insights: true,
+                  include_visualizations: true
+                };
+
+                const response = await fetch(`/api/v1/comparisons/${comparison.id}/export`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(exportRequest)
+                });
+
+                if (!response.ok) {
+                  const errorData = await response.json().catch(() => ({ detail: 'Export failed' }));
+                  throw new Error(errorData.detail || `Export failed with status ${response.status}`);
+                }
+
+                const contentDisposition = response.headers.get('Content-Disposition');
+                let filename = `oedipus-report-${comparison.id}.pdf`;
+                if (contentDisposition) {
+                  const filenameMatch = contentDisposition.match(/filename=([^;]+)/);
+                  if (filenameMatch) filename = filenameMatch[1].replace(/"/g, '');
+                }
+
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+              } catch (error) {
+                console.error('Export failed:', error);
+                alert(`Export failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+              } finally {
+                setIsExporting(false);
+              }
             }}
-            className="text-sm px-3 py-1 bg-purple-100 text-purple-700 rounded hover:bg-purple-200 transition-colors"
+            disabled={isExporting}
+            className="text-sm px-3 py-1 bg-purple-100 text-purple-700 rounded hover:bg-purple-200 transition-colors disabled:opacity-50"
           >
             Full Report
           </button>

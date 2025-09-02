@@ -1,10 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any
 import uuid
 from ...core.database import get_db
 from ...services.comparison_service import ComparisonService
+from ...services.export_service import ExportService
 from ...schemas.comparison import ComparisonCreate, ComparisonResponse
+from ...schemas.export import ExportRequest
 
 router = APIRouter(prefix="/api/v1/comparisons", tags=["comparisons"])
 
@@ -91,3 +94,35 @@ def delete_comparison(
     if not ok:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Comparison not found")
     return None
+
+
+@router.post("/{comparison_id}/export")
+def export_comparison(
+    comparison_id: uuid.UUID,
+    export_request: ExportRequest,
+    db: Session = Depends(get_db)
+):
+    """Export comparison data in the requested format."""
+    try:
+        # Validate that the comparison_id in the URL matches the request
+        if export_request.comparison_id != comparison_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, 
+                detail="Comparison ID in URL must match comparison ID in request body"
+            )
+        
+        export_service = ExportService(db)
+        content_bytes, filename, content_type = export_service.export_comparison(export_request)
+        
+        return Response(
+            content=content_bytes,
+            media_type=content_type,
+            headers={
+                "Content-Disposition": f"attachment; filename={filename}",
+                "Content-Length": str(len(content_bytes))
+            }
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

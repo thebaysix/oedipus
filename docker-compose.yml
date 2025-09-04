@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:15
@@ -28,6 +26,88 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://oedipus:oedipus_password@postgres:5432/oedipus
+      - REDIS_URL=redis://redis:6379/0
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=oedipus
+      - POSTGRES_PASSWORD=oedipus_password
+      - POSTGRES_DB=oedipus
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - OEDIPUS_ENV=docker
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    command: ["uvicorn", "app.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+  worker:
+    build: .
+    environment:
+      - DATABASE_URL=postgresql://oedipus:oedipus_password@postgres:5432/oedipus
+      - REDIS_URL=redis://redis:6379/0
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=oedipus
+      - POSTGRES_PASSWORD=oedipus_password
+      - POSTGRES_DB=oedipus
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - OEDIPUS_ENV=docker
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    command: ["celery", "-A", "app.workers.celery_app", "worker", "--loglevel=info"]
+
+  frontend:
+    build:
+      context: ./react-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://backend:8000
+    volumes:
+      - ./react-frontend:/app
+      - /app/node_modules
+
+  streamlit:
+    build: .
+    ports:
+      - "8501:8501"
+    environment:
+      - DATABASE_URL=postgresql://oedipus:oedipus_password@postgres:5432/oedipus
+      - REDIS_URL=redis://redis:6379/0
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=oedipus
+      - POSTGRES_PASSWORD=oedipus_password
+      - POSTGRES_DB=oedipus
+      - OEDIPUS_ENV=docker
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    command: ["streamlit", "run", "frontend/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
 
 volumes:
   postgres_data:

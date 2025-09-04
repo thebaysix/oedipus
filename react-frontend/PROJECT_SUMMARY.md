@@ -90,8 +90,9 @@ src/components/
 
 ### **Quick Start**
 ```powershell
-cd c:\Code\oedipus\react-frontend
+cd <your-project-path>\react-frontend
 .\setup.ps1              # Installs Node.js + dependencies
+cd ..
 .\start_react_frontend.ps1   # Starts dev server
 ```
 

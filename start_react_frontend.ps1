@@ -10,11 +10,21 @@ param(
 Write-Host "=== Oedipus React Frontend Starter ===" -ForegroundColor Green
 Write-Host ""
 
-$frontendPath = "c:\Code\oedipus\react-frontend"
+# Get the script directory and construct the frontend path dynamically
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$frontendPath = Join-Path $scriptDir "react-frontend"
 
 # Check if frontend directory exists
 if (-not (Test-Path $frontendPath)) {
     Write-Host "Error: React frontend directory not found at $frontendPath" -ForegroundColor Red
+    Write-Host ""
+    Write-Host "Please ensure you're running this script from the Oedipus project root directory." -ForegroundColor Yellow
+    Write-Host "The project root should contain:" -ForegroundColor Yellow
+    Write-Host "  - react-frontend/ directory" -ForegroundColor White
+    Write-Host "  - requirements.txt" -ForegroundColor White
+    Write-Host "  - docker-compose.yml" -ForegroundColor White
+    Write-Host ""
+    Write-Host "Current script location: $scriptDir" -ForegroundColor Gray
     exit 1
 }
 
@@ -116,7 +126,7 @@ try {
     Write-Host "Make sure to start the Oedipus backend before using the frontend" -ForegroundColor White
     Write-Host ""
     Write-Host "To start the backend:" -ForegroundColor Cyan
-    Write-Host "  cd c:\Code\oedipus" -ForegroundColor White
+    Write-Host "  cd $scriptDir" -ForegroundColor White
     Write-Host "  python scripts\start_backend.py" -ForegroundColor White
 }
 

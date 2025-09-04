@@ -30,6 +30,24 @@ Safety → emphasizes alignment, risk detection, and responsible deployment.
    - Make sure Docker is running and added to your system PATH.
 3. Git
 
+### 🚀 Portable Setup (Recommended)
+
+Works from any directory - automatically detects project location:
+
+```powershell
+# Clone repository to any location
+git clone <repository>
+cd oedipus
+
+# One-command setup (Windows)
+.\portable_setup.ps1
+
+# Or for React frontend only
+.\portable_setup.ps1 -ReactOnly
+```
+
+**Alternative setup options:**
+
 ---
 
 ## Option 1: Run with Docker

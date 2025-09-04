@@ -13,12 +13,14 @@ This guide will help you set up and run the Oedipus Comparative Analysis React f
 
 ```powershell
 # Navigate to the React frontend directory
-cd c:\Code\oedipus\react-frontend
+cd <your-project-path>\react-frontend
 
 # Run the automated setup (installs Node.js if needed)
 .\setup.ps1
 
 # Start the development server
+# Or use the startup script from the project root
+cd ..
 .\start_react_frontend.ps1
 ```
 
@@ -31,7 +33,7 @@ cd c:\Code\oedipus\react-frontend
 
 2. **Install dependencies**:
    ```powershell
-   cd c:\Code\oedipus\react-frontend
+   cd <your-project-path>\react-frontend
    npm install
    ```
 
@@ -87,7 +89,7 @@ The React app connects to the Oedipus FastAPI backend at `http://localhost:8000`
 **Start Backend Before Frontend**:
 ```powershell
 # In the main Oedipus directory
-cd c:\Code\oedipus
+cd <your-project-path>
 python scripts\start_backend.py
 ```
 

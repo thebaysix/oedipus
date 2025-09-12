@@ -320,4 +320,4 @@ docs/build/
 *.mprof
 
 # Line profiling
-*.lprof
+*.lprof.venv-oed/

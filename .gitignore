@@ -321,3 +321,7 @@ docs/build/
 
 # Line profiling
 *.lprof
+
+# Local virtual environments and user-specific setup scripts
+.venv*
+.venv-oed/

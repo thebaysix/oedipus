@@ -65,7 +65,7 @@ docker compose up --build
 
 ### Access the Application
 - **React Frontend**: http://localhost:3000 (Primary Interface)
-- **Legacy Streamlit UI**: http://localhost:8501 (Alternative Interface)
+- **Legacy Streamlit UI (deprecated)**: http://localhost:8501 (Alternative Interface)
 - **API Documentation**: http://localhost:8000/docs
 - **API Health**: http://localhost:8000/health
 
@@ -78,22 +78,68 @@ docker compose down
 
 ## Option 2: Local Development Setup
 
+> Recommended for active development: run PostgreSQL and Redis in Docker, and run the backend and frontend locally. This gives you hot-reload during development while keeping stable infrastructure services in containers.
+
 ### 1. Setup Environment
 ```bash
-# Clone and setup
+# Clone repository and enter folder
 git clone <repository>
 cd oedipus
+```
+
+Follow the steps below to create and activate a Python virtual environment named `.venv-oed`. Run the commands appropriate for your OS / shell.
+
+Windows (PowerShell):
+```powershell
+# Create a virtual environment named .venv-oed
+python -m venv .venv-oed
+
+# Activate the virtual environment (PowerShell)
+# If PowerShell execution policy blocks activation, run: Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+.\.venv-oed\Scripts\Activate.ps1
+```
+
+Windows (Command Prompt / cmd.exe):
+```cmd
+# Create a virtual environment named .venv-oed
+python -m venv .venv-oed
+
+# Activate the virtual environment (cmd.exe)
+.\.venv-oed\Scripts\activate.bat
+```
+
+Ubuntu / macOS / Linux (bash):
+```bash
+# Create a virtual environment named .venv-oed
+python3 -m venv .venv-oed
+
+# Activate the virtual environment
+source .venv-oed/bin/activate
+```
+
+Once the virtual environment is activated, run the project setup:
+```bash
+# Inside the activated venv
 python scripts/setup.py
 ```
 
 ### 2. Start Infrastructure
 ```bash
-docker compose up -d  # PostgreSQL + Redis
+# Start PostgreSQL + Redis only (use this when you plan to run the backend locally)
+docker compose up -d postgres redis
+
+# If you want to bring up the entire stack (API, DB, Redis, Worker, Frontend) in containers,
+# run the full compose command instead:
+# docker compose up --build
 ```
 
 ### 3. Initialize Database
 ```bash
 alembic upgrade head
+# Alternatively, you can have the backend script run migrations automatically by
+# setting the environment variable (recommended for CI or automated local setup):
+# export MIGRATE_ON_START=1
+# python scripts/start_backend.py
 ```
 
 ### 4. Start Services
@@ -109,13 +155,13 @@ cd react-frontend
 npm install
 npm run dev
 
-# Terminal 4: Legacy Streamlit Frontend (optional)
+# Terminal 4: Legacy Streamlit Frontend (optional, deprecated)
 python scripts/start_frontend.py
 ```
 
 ### Access the Application
 - **React Frontend**: http://localhost:3000 (Primary Interface)
-- **Legacy Streamlit UI**: http://localhost:8501 (Alternative Interface)
+- **Legacy Streamlit UI (deprecated)**: http://localhost:8501 (Alternative Interface)
 - **API Documentation**: http://localhost:8000/docs
 - **API Health**: http://localhost:8000/health
 
@@ -408,7 +454,7 @@ React Frontend → API (FastAPI) → Database (PostgreSQL)
 - **FastAPI**: REST API with automatic documentation and background tasks
 - **PostgreSQL**: Primary data storage with JSON support
 - **Redis**: Caching and session storage
-- **Streamlit**: Legacy interface (still available)
+- **Streamlit**: Legacy interface (deprecated)
 - **Background Tasks**: Async analysis processing
 
 ## Data Format
@@ -477,8 +523,8 @@ oedipus/
 │   │   └── utils/         # Helper functions
 │   ├── package.json       # Node.js dependencies
 │   └── vite.config.ts     # Build configuration
-├── frontend/              # Legacy Streamlit interface
-│   ├── components/        # Streamlit components
+├── frontend/              # Legacy Streamlit interface (deprecated)
+│   ├── components/        # Streamlit components (deprecated)
 │   └── utils/             # Helper functions
 ├── scripts/               # Setup & start scripts
 ├── tests/                 # Test suite
@@ -525,6 +571,34 @@ alembic upgrade head
 - Check worker status and logs
 - Consider reducing dataset size for testing
 
+#### Docker permission denied when using `docker compose`
+
+If you see an error like:
+
+```
+unable to get image 'oedipus-frontend': permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.51/images/oedipus-frontend/json": dial unix /var/run/docker.sock: connect: permission denied
+```
+
+This usually means your user does not have permission to access the Docker daemon socket. The recommended fix is to add your user to the `docker` group so you can run Docker commands without `sudo`.
+
+Run the following commands:
+
+```bash
+# Create the docker group if it doesn’t exist
+sudo groupadd docker
+
+# Add your user to it
+sudo usermod -aG docker $USER
+```
+
+Then log out and log back in (or reboot) so the new group membership takes effect. After that you should be able to run:
+
+```bash
+docker compose up -d
+```
+
+without `sudo`.
+
 ### Logs
 ```bash
 # API logs
@@ -536,6 +610,23 @@ celery -A app.workers.analysis_worker worker --loglevel=debug
 # Docker service logs
 docker compose logs [service_name]
 ```
+
+#### Fix host file permissions for `entrypoint.sh` (when mounting code)
+
+If you mount the project directory into a container (for example during development with `docker compose`), the container will use the host's copy of `entrypoint.sh`. If that file is not executable on the host or has Windows-style line endings (CRLF), the container may fail to run the script.
+
+Fix this on your host system by running:
+
+```bash
+# Make script executable
+chmod +x entrypoint.sh
+
+# If the file was edited on Windows, convert CRLF → LF
+# (only needed if you see issues; requires `dos2unix`)
+dos2unix entrypoint.sh
+```
+
+After making these changes on your host, restart the containers so the mounted script is used with the correct permissions.
 
 ## Performance
 

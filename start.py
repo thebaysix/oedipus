@@ -79,9 +79,9 @@ def main():
     print("   # Terminal 2:")
     print("   celery -A app.workers.analysis_worker worker --loglevel=info")
     print("   # Terminal 3:")
-    print("   streamlit run frontend/streamlit_app.py")
+    print("   cd react-frontend && npm run dev")
     print("\n4. Open your browser:")
-    print("   Frontend: http://localhost:8501")
+    print("   Frontend: http://localhost:3000")
     print("   API Docs: http://localhost:8000/docs")
 
 if __name__ == "__main__":

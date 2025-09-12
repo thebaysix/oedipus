@@ -1,27 +1,25 @@
 #!/usr/bin/env python3
 """
-Start the Streamlit frontend
+Start the React frontend (Vite)
 """
 import subprocess
 import sys
 import os
 
 def main():
-    """Start the Streamlit frontend."""
-    print("🎨 Starting Oedipus MVP Frontend...")
+    """Start the React frontend (Vite dev server)."""
+    print("🎨 Starting Oedipus React Frontend...")
     
     try:
         # Change to project root
         os.chdir(os.path.dirname(os.path.dirname(__file__)))
         
-        # Start Streamlit
+        # Start React dev server
         subprocess.run([
-            "streamlit", 
-            "run", 
-            "frontend/streamlit_app.py",
-            "--server.port", "8501",
-            "--server.address", "0.0.0.0"
-        ], check=True)
+            "npm",
+            "run",
+            "dev",
+        ], check=True, cwd=os.path.join(os.getcwd(), "react-frontend"))
         
     except KeyboardInterrupt:
         print("\n👋 Frontend stopped")

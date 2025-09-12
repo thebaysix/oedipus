@@ -87,28 +87,6 @@ services:
       - ./react-frontend:/app
       - /app/node_modules
 
-  streamlit:
-    build: .
-    ports:
-      - "8501:8501"
-    environment:
-      - DATABASE_URL=postgresql://oedipus:oedipus_password@postgres:5432/oedipus
-      - REDIS_URL=redis://redis:6379/0
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_USER=oedipus
-      - POSTGRES_PASSWORD=oedipus_password
-      - POSTGRES_DB=oedipus
-      - OEDIPUS_ENV=docker
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    volumes:
-      - .:/app
-    command: ["streamlit", "run", "frontend/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
-
 volumes:
   postgres_data:
   redis_data:

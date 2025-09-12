@@ -122,6 +122,7 @@ celerybeat.pid
 # Environments
 .env
 .venv
+.venv-oed/
 env/
 venv/
 ENV/
@@ -321,6 +322,7 @@ docs/build/
 
 # Line profiling
 *.lprof
+*.lprof.venv-oed/
 
 # Local virtual environments and user-specific setup scripts
 .venv*
